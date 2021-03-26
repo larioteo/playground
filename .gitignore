@@ -1,1 +1,14 @@
+﻿# Build
+/[Bb]uild/
+/[Cc]ache/
 
+# Directories
+.vs/
+.vscode/
+
+# Files
+*.log
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
