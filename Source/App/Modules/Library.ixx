@@ -12,6 +12,10 @@ export namespace app {
 typedef void (*TestEXT)(void);
 typedef void (*TestEXT2)(void);
 
+void Print(auto var) {
+    std::cout << var;
+}
+
 void LoadModule() {
     HINSTANCE hLibrary = LoadLibrary(L"Library.dll");
    

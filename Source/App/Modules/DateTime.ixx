@@ -1,51 +1,16 @@
 ﻿module;
 
-#include <algorithm>
-#include <cstdint>
 #include <chrono>
-#include <filesystem>
-#include <functional>
-#include <memory>
-#include <mutex>
-#include <random>
-#include <type_traits>
-#include <utility>
-
-#include <future>
-#include <thread>
-
-#include <iostream>
 #include <iomanip>
-#include <fstream>
-#include <ostream>
-#include <sstream>
 
-#include <any>
-#include <array>
-#include <map>
-#include <optional>
-#include <queue>
-#include <string>
-#include <string_view>
-#include <unordered_map>
-#include <unordered_set>
-#include <vector>
-
-export module DateTime;
-
-export namespace Omnia { namespace Utility {
+export module App.Utility.DateTime;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-/**
-* @brief Internal application date & time ticker.
-*/
-class DateTime {
-    // Properties
-    static const time_point<high_resolution_clock> StartTime;
-    nanoseconds Nanoseconds = 0ns;
+export namespace app { namespace utility {
 
+class DateTime {
 public:
     DateTime() = default;
     template <typename Rep, typename Period>
@@ -119,7 +84,9 @@ public:
         ss << std::put_time(std::localtime(&time), format.c_str());
         return ss.str();
     }
-    static const DateTime Now() { return duration_cast<nanoseconds>(high_resolution_clock::now() - StartTime); }
+    static const DateTime Now() {
+        return duration_cast<nanoseconds>(high_resolution_clock::now() - StartTime);
+    }
 
     // Comparision
     bool operator==(const DateTime &rhs) const { return Nanoseconds == rhs.Nanoseconds; }
@@ -138,31 +105,15 @@ public:
         return std::modf(duration_cast<duration<double, Period>>(Nanoseconds), duration_cast<duration<double, Period>>(other.Nanoseconds));
     }
 
-    //DateTime operator+() const { return DateTime(+Nanoseconds); }
-    //DateTime operator-() const { return DateTime(-Nanoseconds); }
-
-    //DateTime &operator+=(const DateTime &rhs) { return *this = *this + rhs; }
-    //DateTime &operator-=(const DateTime &rhs) { return *this = *this - rhs; }
-    //DateTime &operator*=(float rhs) { return *this = *this * rhs; }
-    //DateTime &operator/=(float rhs) { return *this = *this / rhs; }
-    //DateTime &operator*=(long rhs) { return *this = *this * rhs; }
-    //DateTime &operator/=(long rhs) { return *this = *this / rhs; }
-
-    //friend DateTime operator+(const DateTime &left, const DateTime &right) { return left.Microseconds + right.Microseconds; }
-    //friend DateTime operator-(const DateTime &left, const DateTime &right) { return left.Microseconds - right.Microseconds; }
-    //friend DateTime operator*(const DateTime &left, float right) { return left.Microseconds * right; }
-    //friend DateTime operator*(const DateTime &left, int64_t right) { return left.Microseconds * right; }
-    //friend DateTime operator*(float left, const DateTime &right) { return right * left; }
-    //friend DateTime operator*(long left, const DateTime &right) { return right * left; }
-    //friend DateTime operator/(const DateTime &left, float right) { return left.Microseconds / right; }
-    //friend DateTime operator/(const DateTime &left, int64_t right) { return left.Microseconds / right; }
-    //friend double operator/(const Time &left, const Time &right) { return static_cast<double>(left.Microseconds.count()) / static_cast<double>(right.Microseconds.count()); }
+private:
+    static const time_point<high_resolution_clock> StartTime;
+    nanoseconds Nanoseconds = {}; //0ns
 };
 
 inline const time_point<high_resolution_clock> DateTime::StartTime(high_resolution_clock::now());
 
 }
 
-inline Utility::DateTime apptime;
+inline utility::DateTime clock;
 
 }
