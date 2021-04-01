@@ -8,8 +8,10 @@ project "App"
     cppdialect "C++Latest"
     cppmodules "true"
     toolset "msc"
+	
+	links { "Library" }
 
-    files { "**.h", "**.cpp", "**.ixx" }
+    files { "**.h", "**.cpp", "**.cppm", "**.ixx" }
 
     filter { "configurations:Debug" }
         defines { "_DEBUG" }

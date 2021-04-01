@@ -1,5 +1,6 @@
 ﻿#include <Settings.h>
 
+#include <chrono>
 #include <iostream>
 
 import App.System.Cli;
@@ -8,9 +9,9 @@ import App.Utility.Random;
 import App.Utility.String;
 import App.Utility.Timer;
 import App.Utility.UUID;
-import Library;
+//import Test;
 
-int main() {
+int main(int argc, char **argv) {
     // Preparation
     #define APP_PLATFORM_WINDOWS1
     #ifdef APP_PLATFORM_WINDOWS
@@ -22,12 +23,16 @@ int main() {
 
     // DateTime
     std::cout << app::clock.GetTimeStamp() << std::endl;
+    std::cout << app::clock.GetIsoDate() << std::endl;
+    std::cout << app::clock.GetIsoTime() << std::endl;
 
-    // DynamicLibrary
-    app::LoadModule();
+    //// DynamicLibrary
+    //app::LoadModule();
 
-    // Utilities
+    //// Utilities
     app::String::Test();
     app::UUID uuid;
     std::cout << uuid << std::endl;
+
+    return 0;
 }

@@ -1,8 +1,8 @@
 ﻿module;
 
-#include <random>
-
 export module App.Utility.Random;
+
+import <random>;
 
 export class Random {
 public:

@@ -5,7 +5,7 @@
 
 #include <windows.h>
 
-export module Library;
+export module Test;
 
 export namespace app {
 

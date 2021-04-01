@@ -7,7 +7,7 @@ project "Library"
     cppdialect "C++Latest"
     cppmodules "true"
     toolset "msc"
-
+	
     files { "**.h", "**.cpp", "**.ixx" }
 
     filter { "configurations:Debug" }

@@ -1,12 +1,12 @@
 ﻿module;
 
-#include <algorithm>
-#include <sstream>
-#include <string>
-#include <string_view>
-#include <vector>
-
 export module App.Utility.String;
+
+import <algorithm>;
+import <sstream>;
+import <string>;
+import <string_view>;
+import <vector>;
 
 using std::string;
 using std::stringstream;

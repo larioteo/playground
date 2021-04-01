@@ -1,6 +1,7 @@
 ﻿module;
 
 #include <chrono>
+//#include <format>
 #include <iomanip>
 
 export module App.Utility.DateTime;
@@ -66,35 +67,17 @@ public:
         //return format("%d-%m-%Y %T", floor<microseconds>(system_clock::now())) << '\n';
     }
     static const std::string GetIsoDate() {
-        std::string format = "%Y-%m-%d";
-        auto now = floor<std::chrono::microseconds>(system_clock::now());
-        auto time = system_clock::to_time_t(now);
-
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&time), format.c_str());
-
-        return ss.str();
+        return GetDateTime(DateFormat);
     }
     static const std::string GetIsoTime() {
-        std::string format = "%H:%M:%S";
-        auto now = floor<std::chrono::microseconds>(system_clock::now());
-        auto time = system_clock::to_time_t(now);
-
-        std::stringstream ss;
-        ss << std::put_time(std::localtime(&time), format.c_str());
-        return ss.str();
+        return GetDateTime(TimeFormat);
     }
     static const DateTime Now() {
         return duration_cast<nanoseconds>(high_resolution_clock::now() - StartTime);
     }
 
     // Comparision
-    bool operator==(const DateTime &rhs) const { return Nanoseconds == rhs.Nanoseconds; }
-    bool operator!=(const DateTime &rhs) const { return Nanoseconds != rhs.Nanoseconds; }
-    bool operator<(const DateTime &rhs) const { return Nanoseconds < rhs.Nanoseconds; }
-    bool operator<=(const DateTime &rhs) const { return Nanoseconds <= rhs.Nanoseconds; }
-    bool operator>(const DateTime &rhs) const { return Nanoseconds > rhs.Nanoseconds; }
-    bool operator>=(const DateTime &rhs) const { return Nanoseconds >= rhs.Nanoseconds; }
+    auto operator<=>(const DateTime &rhs) const { return Nanoseconds.count() <=> rhs.Nanoseconds.count(); }
 
     // Operators
     template <typename Rep, typename Period>
@@ -106,6 +89,19 @@ public:
     }
 
 private:
+    static const std::string GetDateTime(const std::string &format) {
+        auto now = floor<std::chrono::microseconds>(system_clock::now());
+        auto time = system_clock::to_time_t(now);
+
+        std::stringstream ss;
+        ss << std::put_time(std::localtime(&time), format.c_str());
+        return ss.str();
+    }
+
+    static const inline std::string DateFormat = "%Y-%m-%d";
+    static const inline std::string TimeFormat = "%H:%M:%S";
+
+
     static const time_point<high_resolution_clock> StartTime;
     nanoseconds Nanoseconds = {}; //0ns
 };

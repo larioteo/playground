@@ -1,11 +1,11 @@
 ﻿module;
 
-#include <ostream>
-#include <random>
-#include <sstream>
-#include <string>
-
 export module App.Utility.UUID;
+
+import <ostream>;
+import <random>;
+import <sstream>;
+import <string>;
 
 using std::ostream;
 using std::stringstream;
