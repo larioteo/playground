@@ -7,14 +7,14 @@
 #include <vector>
 #include <type_traits>
 
-export module App.Utility.String;
+export module Ultra.Utility.String;
 
 using std::string;
 using std::stringstream;
 using std::string_view;
 using std::vector;
 
-export namespace app {
+export namespace Ultra {
 
 template<typename T>
 concept typename_string = std::is_same_v<string, T> || std::is_same_v<std::wstring, T>;

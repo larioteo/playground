@@ -12,11 +12,11 @@
 
 #include "Core.h"
 
-export module App.Log;
+export module Ultra.Log;
 
-import App.System.Cli;
-import App.Utility.DateTime;
-import App.Utility.String;
+import Ultra.System.Cli;
+import Ultra.Utility.DateTime;
+import Ultra.Utility.String;
 
 using std::is_same_v;
 using std::mutex;
@@ -27,7 +27,7 @@ using std::stringstream;
 
 using namespace std::string_literals;
 
-export namespace app {
+export namespace Ultra {
 
 // Enumerations
 enum class LogLevel {
@@ -83,7 +83,7 @@ public:
                     CaptionActive = false;
                     stream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
                 }
-                stream << cli::Style::Reset << cli::Color::White;
+                stream << Cli::Style::Reset << Cli::Color::White;
                 Counter++;
             }
         }
@@ -98,7 +98,7 @@ public:
             CaptionActive = false;
         }
         mSkip = false;
-        stream << cli::Style::Reset << cli::Color::White << T;
+        stream << Cli::Style::Reset << Cli::Color::White << T;
         return (*this);
     }
 
@@ -112,24 +112,24 @@ public:
             if (data >= mLogLevel) {
                 mSkip = false;
                 switch (data) {
-                    case LogLevel::Fatal:	    { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::Red				<< "[ Fatal ] ";    break; }
-                    case LogLevel::Error:       { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::LightRed		    << "[ Error ] ";    break; }
-                    case LogLevel::Warn:        { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::LightYellow		<< "[ Warn  ] ";    break; }
-                    case LogLevel::Info:        { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::LightGray		<< "[ Info  ] ";    break; }
-                    case LogLevel::Debug:       { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::LightGreen		<< "[ Debug ] ";    break; }
-                    case LogLevel::Trace:       { stream << cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << cli::Color::LightMagenta	    << "[ Trace ] ";    break; }
+                    case LogLevel::Fatal:	    { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::Red				<< "[ Fatal ] ";    break; }
+                    case LogLevel::Error:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightRed		    << "[ Error ] ";    break; }
+                    case LogLevel::Warn:        { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightYellow		<< "[ Warn  ] ";    break; }
+                    case LogLevel::Info:        { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGray		<< "[ Info  ] ";    break; }
+                    case LogLevel::Debug:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGreen		<< "[ Debug ] ";    break; }
+                    case LogLevel::Trace:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightMagenta	    << "[ Trace ] ";    break; }
 
                     case LogLevel::Caption:     {
                         CaptionActive = true;
-                        stream << cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        stream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
                         break;
                     }
                     case LogLevel::Delimiter:   {
-                        stream << cli::Color::Yellow    << "----------------------------------------------------------------\n";
+                        stream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
                         break;
                     }
                     
-                    default:                    { stream << cli::Color::White;  break; }
+                    default:                    { stream << Cli::Color::White;  break; }
                 }
             } else {
                 mSkip = true;
@@ -159,12 +159,12 @@ public:
 
         Log::Instance() << LogLevel::Delimiter;
         Log::Instance() << LogLevel::Default    << "This "
-            << cli::Background::White << cli::Color::Black << "is "
-            << cli::Background::Default << cli::Color::LightBlue << "a "
-            << cli::Color::LightRed     << "multi" << cli::Color::LightGray << "-"
-            << cli::Color::LightGreen   << "color" << cli::Color::LightCyan << "-"
-            << cli::Color::LightBlue    << "test"
-            << cli::Color::Default      << "!\n";
+            << Cli::Background::White << Cli::Color::Black << "is "
+            << Cli::Background::Default << Cli::Color::LightBlue << "a "
+            << Cli::Color::LightRed     << "multi" << Cli::Color::LightGray << "-"
+            << Cli::Color::LightGreen   << "color" << Cli::Color::LightCyan << "-"
+            << Cli::Color::LightBlue    << "test"
+            << Cli::Color::Default      << "!\n";
     }
 
     // Properties
@@ -182,7 +182,7 @@ private:
 };
 
 // This is the preferred instance to the logging class.
-Log &applog = app::Log::Instance();
+Log &applog = Ultra::Log::Instance();
 
 ///
 /// @brief  As good as the logging class can be, we need something for applications where performance matters. Therefore the following function templates

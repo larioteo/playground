@@ -4,14 +4,14 @@
 #include <iostream>
 #include <ostream>
 
-export module App.System.Cli;
+export module Ultra.System.Cli;
 
 ///
-/// @brief CLI Modifiers: These extend the output stream with backgrounds, colors and styles.
+/// @brief Cli Modifiers: These extend the output stream with backgrounds, colors and styles.
 /// @note Tested with Windows Terminal
 /// @source https://en.wikipedia.org/wiki/ANSI_escape_code
 /// 
-export namespace app { export namespace cli {
+export namespace Ultra { export namespace Cli {
 
 enum class Background {
     Default         = 49,
@@ -88,12 +88,12 @@ enum class Style {
 };
 
 template <typename T>
-concept typename_climodifier =
-    std::is_same_v<T, app::cli::Background> ||
-    std::is_same_v<T, app::cli::Color> ||
-    std::is_same_v<T, app::cli::Style>;
+concept typename_Climodifier =
+    std::is_same_v<T, Ultra::Cli::Background> ||
+    std::is_same_v<T, Ultra::Cli::Color> ||
+    std::is_same_v<T, Ultra::Cli::Style>;
 
-template <typename_climodifier T>
+template <typename_Climodifier T>
 inline std::ostream &operator<<(std::ostream &os, T type) {
     return os << "\x1b[" << static_cast<int>(type) << "m";
 }

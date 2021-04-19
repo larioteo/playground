@@ -2,4 +2,4 @@
 
 #include "Core.h"
 
-export module App.EntryPoint;
+export module Ultra.EntryPoint;

@@ -2,7 +2,7 @@
 
 #include <random>
 
-export module App.Utility.Random;
+export module Ultra.Utility.Random;
 
 export class Random {
 public:

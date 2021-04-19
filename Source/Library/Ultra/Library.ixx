@@ -5,9 +5,9 @@
 
 #include <windows.h>
 
-export module App.System.Library;
+export module Ultra.System.Library;
 
-export namespace app {
+export namespace Ultra {
 
 typedef void (*TestEXT)(void);
 typedef void (*TestEXT2)(void);

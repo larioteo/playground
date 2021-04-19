@@ -5,7 +5,7 @@
 #include <sstream>
 #include <string>
 
-export module App.Utility.UUID;
+export module Ultra.Utility.UUID;
 
 using std::ostream;
 using std::stringstream;
@@ -33,7 +33,7 @@ using std::string;
 
 #pragma endregion
 
-export namespace app {
+export namespace Ultra {
 
 // Currently we use string to hold the 128-Bit value, cause in our usecase it doesn't really matter, all other unsigned integers hold a basic random number
 template<typename T>

@@ -2,11 +2,11 @@
 
 #include "../Core.h"
 
-export module App.LayerStack;
+export module Ultra.LayerStack;
 
-import App.Layer;
+import Ultra.Layer;
 
-export namespace app {
+export namespace Ultra {
 
 class LayerStack {
 	vector<Layer *> Layers;

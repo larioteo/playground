@@ -2,9 +2,9 @@
 
 #include "Core.h"
 
-import App.Application;
+import Ultra.Application;
 
-extern app::Application *CreateApplication();
+extern Ultra::Application *CreateApplication();
 
 int main(int argc, char **argv) {
     // Preparation

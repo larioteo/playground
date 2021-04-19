@@ -3,11 +3,11 @@
 #include "../Core.h"
 //#include "Omnia/UI/Event.h"
 
-export module App.Layer;
+export module Ultra.Layer;
 
-import App.Utility.Timer;
+import Ultra.Utility.Timer;
 
-export namespace app {
+export namespace Ultra {
 
 class Layer {
 protected:

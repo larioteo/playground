@@ -12,7 +12,7 @@
 #include <queue>
 #include <vector>
 
-namespace app {
+namespace Ultra {
 
 using std::int8_t;
 using std::int16_t;

@@ -3,7 +3,7 @@
 /*
 	These values are used to control platform specific features like window creation.
 */
-namespace Omnia {
+namespace Ultra {
 /*
 	Preprocessor Utilities
 */

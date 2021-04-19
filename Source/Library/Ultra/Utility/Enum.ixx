@@ -2,9 +2,9 @@
 
 #include <type_traits>
 
-export module App.Utility.Enum;
+export module Ultra.Utility.Enum;
 
-export namespace app { namespace utility {
+export namespace Ultra { namespace Utility {
 
 ///
 /// @brief Converts enumeration value to BitMask value

@@ -3,19 +3,19 @@
 
 #include <future>
 
-import App.Application;
-import App.Log;
-import App.System.Cli;
-import App.Utility.DateTime;
-import App.Utility.Enum;
-import App.Utility.EventData;
-import App.Utility.Random;
-import App.Utility.String;
-import App.Utility.Timer;
-import App.Utility.UUID;
+import Ultra.Application;
+import Ultra.Log;
+import Ultra.System.Cli;
+import Ultra.Utility.DateTime;
+import Ultra.Utility.Enum;
+import Ultra.Utility.EventData;
+import Ultra.Utility.Random;
+import Ultra.Utility.String;
+import Ultra.Utility.Timer;
+import Ultra.Utility.UUID;
 
 // Application
-namespace app {
+namespace Ultra {
 
 class App: public Application {
 public:
@@ -56,13 +56,13 @@ public:
 
         /// Default
         // Log
-        applog << LogLevel::Default << cli::Color::White << "Hello " << cli::Color::Blue << "Wo" << cli::Color::Red << "rl" << cli::Color::Yellow << "d!" << std::endl;
+        applog << LogLevel::Default << Cli::Color::White << "Hello " << Cli::Color::Blue << "Wo" << Cli::Color::Red << "rl" << Cli::Color::Yellow << "d!" << std::endl;
         AppLogInfo("Info");
-        applog << cli::Color::Red << "Haha\n";
+        applog << Cli::Color::Red << "Haha\n";
 
         /// System
         // Cli
-        app::cli::Test();
+        Cli::Test();
 
         /// Utilities
         // DateTime
@@ -72,10 +72,10 @@ public:
 
         // Enum
         Log::Test();
-        applog << "EventCategory::System: " << GetEnumType(app::utility::EventCategory::System) << "\n";
+        applog << "EventCategory::System: " << GetEnumType(Utility::EventCategory::System) << "\n";
 
         // EventData
-        utility::IEventData data = { app::utility::EventSource::Device };
+        Utility::IEventData data = { Utility::EventSource::Device };
         applog << data;
 
         // String
@@ -93,7 +93,7 @@ public:
 
         // Default
         for (int i = 0; i <= Iterations; i++) {
-            applog << LogLevel::Default << "" << cli::Style::Reset;
+            applog << LogLevel::Default << "" << Cli::Style::Reset;
         }
 
         return timer.GetDeltaTime();
@@ -103,6 +103,6 @@ public:
 }
 
 // Application Entry-Point
-app::Application *CreateApplication() {
-    return new app::App({ "Playground", "1280x1024" });
+Ultra::Application *CreateApplication() {
+    return new Ultra::App({ "Playground", "1280x1024" });
 }

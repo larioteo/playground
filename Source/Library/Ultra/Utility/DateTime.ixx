@@ -4,12 +4,12 @@
 //#include <format>
 #include <iomanip>
 
-export module App.Utility.DateTime;
+export module Ultra.Utility.DateTime;
 
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
-export namespace app { namespace utility {
+export namespace Ultra { namespace Utility {
 
 class DateTime {
 public:
@@ -110,6 +110,6 @@ inline const time_point<high_resolution_clock> DateTime::StartTime(high_resoluti
 
 }
 
-inline utility::DateTime apptime;
+inline Utility::DateTime apptime;
 
 }

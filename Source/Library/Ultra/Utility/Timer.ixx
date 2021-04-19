@@ -2,11 +2,11 @@
 
 #include <chrono>
 
-export module App.Utility.Timer;
+export module Ultra.Utility.Timer;
 
 using namespace std::literals::chrono_literals;
 
-export namespace app {
+export namespace Ultra {
 
 /// @brief Timestamp which holds milliseconds in a double.
 class Timestamp {

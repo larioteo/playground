@@ -8,15 +8,15 @@
 //#include "Omnia/UI/GuiLayer.h"
 //#include "Omnia/UI/Window.h"
 
-export module App.Application;
+export module Ultra.Application;
 
-import App.Layer;
-import App.LayerStack;
-import App.Log;
-import App.Utility.DateTime;
-import App.Utility.Timer;
+import Ultra.Layer;
+import Ultra.LayerStack;
+import Ultra.Log;
+import Ultra.Utility.DateTime;
+import Ultra.Utility.Timer;
 
-export namespace app {
+export namespace Ultra {
 
 // The title, resolution and graphics API can be passed as structure.
 struct ApplicationProperties {
