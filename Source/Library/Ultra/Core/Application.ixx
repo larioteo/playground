@@ -106,7 +106,7 @@ public:
         //APP_PROFILE_BEGIN_SESSION("Application", "AppProfile.json");
         Timer timer = {};
         double delay = {};
-        size_t frames = {};
+        double frames = {};
         string statistics;
         string title = {};
         //string title = mWindow->GetTitle();

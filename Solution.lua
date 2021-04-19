@@ -4,6 +4,7 @@ workspace "Solution"
     defines { "SOLUTION_NAME=Solution" }
     architecture "x64"
     configurations { "Debug", "Release", "Distribution" }
+    buildoptions "/utf-8"
     flags { "MultiProcessorCompile" }
     startproject "App"
     systemversion "latest"

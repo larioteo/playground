@@ -6,6 +6,9 @@
 
 export module Ultra.Utility.DateTime;
 
+#pragma warning(push)
+#pragma warning(disable: 4996)
+
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
@@ -113,3 +116,5 @@ inline const time_point<high_resolution_clock> DateTime::StartTime(high_resoluti
 inline Utility::DateTime apptime;
 
 }
+
+#pragma warning(pop)
