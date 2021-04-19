@@ -1,12 +1,13 @@
 ﻿module;
 
-export module App.Utility.String;
+#include <algorithm>
+#include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
+#include <type_traits>
 
-import <algorithm>;
-import <sstream>;
-import <string>;
-import <string_view>;
-import <vector>;
+export module App.Utility.String;
 
 using std::string;
 using std::stringstream;
@@ -124,12 +125,12 @@ public:
         }
         return tokens;
     }
-    template<typename_string T = string>
+    template<typename T = string> // ToDo: Concept doesn't work as expected after 16.10 Preview 2
     static T &ToLower(T &value) noexcept {
         std::transform(value.begin(), value.end(), value.begin(), ::tolower);
         return value;
     }
-    template<typename_string T = string>
+    template<typename T = string> // ToDo: Concept doesn't work as expected after 16.10 Preview 2
     static T &ToUpper(T &value) noexcept {
         std::transform(value.begin(), value.end(), value.begin(), ::toupper);
         return value;

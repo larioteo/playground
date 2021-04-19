@@ -1,4 +1,4 @@
--- Visual Studio: Solution Items (multiple folders)
+﻿-- Visual Studio: Solution Items (multiple folders)
 -- Source: https://github.com/premake/premake-core/issues/1061
 require('vstudio')
 premake.api.register {

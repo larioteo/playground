@@ -1,8 +1,8 @@
 ﻿module;
 
-export module App.Utility.Timer;
+#include <chrono>
 
-import <chrono>;
+export module App.Utility.Timer;
 
 using namespace std::literals::chrono_literals;
 

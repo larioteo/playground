@@ -110,6 +110,6 @@ inline const time_point<high_resolution_clock> DateTime::StartTime(high_resoluti
 
 }
 
-inline utility::DateTime clock;
+inline utility::DateTime apptime;
 
 }

@@ -1,17 +1,17 @@
 ﻿module;
 
-export module App.System.Cli;
+#include <iomanip>
+#include <iostream>
+#include <ostream>
 
-import <iomanip>;
-import <iostream>;
-import <ostream>;
+export module App.System.Cli;
 
 ///
 /// @brief CLI Modifiers: These extend the output stream with backgrounds, colors and styles.
 /// @note Tested with Windows Terminal
 /// @source https://en.wikipedia.org/wiki/ANSI_escape_code
 /// 
-export namespace app { namespace cli {
+export namespace app { export namespace cli {
 
 enum class Background {
     Default         = 49,
@@ -87,18 +87,16 @@ enum class Style {
     Reset           = 0,
 };
 
-
 template <typename T>
 concept typename_climodifier =
-    std::is_same_v<Background, T> ||
-    std::is_same_v<Color, T> ||
-    std::is_same_v<Style, T>;
+    std::is_same_v<T, app::cli::Background> ||
+    std::is_same_v<T, app::cli::Color> ||
+    std::is_same_v<T, app::cli::Style>;
 
 template <typename_climodifier T>
 inline std::ostream &operator<<(std::ostream &os, T type) {
     return os << "\x1b[" << static_cast<int>(type) << "m";
 }
-
 
 void Test() {
     using std::cout;

@@ -1,13 +1,14 @@
-project "Library"
+﻿project "Library"
     defines { "PROJECT_NAME=Library" }
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
+	characterset "Unicode"
     confromancemode "true"
     cdialectx "C17"
     cppdialect "C++Latest"
     cppmodules "true"
     toolset "msc"
-	
+
     files { "**.h", "**.cpp", "**.ixx" }
 
     filter { "configurations:Debug" }

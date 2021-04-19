@@ -1,4 +1,4 @@
-include "3rd-Party/Build/Modules.lua"
+﻿include "3rd-Party/Build/Modules.lua"
 
 workspace "Solution"
     defines { "SOLUTION_NAME=Solution" }
@@ -12,6 +12,8 @@ workspace "Solution"
     objdir "Cache/"
     targetdir "Build/%{cfg.buildcfg}"
 	
+    Headers = {}
+    Headers["Library"] = "%{wks.location}/Source/Library"
 
     group "3rd-Party"
         include "3rd-Party/3rd-Party.lua"
