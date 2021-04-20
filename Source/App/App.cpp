@@ -4,6 +4,7 @@
 #include <future>
 
 import Ultra;
+//import Ultra.EntryPoint; // ToDo: Check if it is possible to export the main function
 
 // Application
 namespace Ultra {
@@ -25,8 +26,12 @@ public:
 
     // Tests
     void Test() {
+        // Preparation
+        applog << "\n";
+
         // Single-Threaded
         auto durationST = TestST();
+        applog << "Single-Threaded[" << applog.GetCounter() << "]: " << durationST << "ms\n";
 
         // Multi-Threaded
         auto future1 = std::async(std::launch::async, TestMT);
@@ -34,11 +39,7 @@ public:
         auto future3 = std::async(std::launch::async, TestMT);
         auto future4 = std::async(std::launch::async, TestMT);
         auto durationMT = future1.get() + future2.get() + future3.get() + future4.get();
-
-        // Statistics
-        applog << "\n";
-        applog << "Single-Threaded[" << applog.Counter << "]: " << durationST << "ms\n";
-        applog << "Multi-Threaded[" << applog.Counter << "]: " << durationMT << "ms\n";
+        applog << "Multi-Threaded[" << applog.GetCounter() << "]: " << durationMT << "ms\n";
     }
 
     static double TestST() {
@@ -46,6 +47,13 @@ public:
         auto timer = Timer();
 
         /// Default
+        // Settings
+        applog << "Application Information\n"
+            << " - Caption:     " << Solution::AppCaption << "\n"
+            << " - Description: " << Solution::AppDescription << "\n"
+            << " - Release:     " << Solution::AppRelease << "\n"
+            << " - Version:     " << Solution::AppVersion << "\n"
+            << "\n";
         // Log
         applog << LogLevel::Default << Cli::Color::White << "Hello " << Cli::Color::Blue << "Wo" << Cli::Color::Red << "rl" << Cli::Color::Yellow << "d!" << std::endl;
         AppLogInfo("Info");
@@ -80,12 +88,13 @@ public:
     static double TestMT() {
         auto timer = Timer();
 
-        const auto Iterations = 10000;
+        const auto Iterations = 1000;
 
         // Default
         for (int i = 0; i <= Iterations; i++) {
-            applog << LogLevel::Default << "" << Cli::Style::Reset;
+            applog << LogLevel::Default << "." << Cli::Style::Reset;
         }
+        applog << std::endl;
 
         return timer.GetDeltaTime();
     }

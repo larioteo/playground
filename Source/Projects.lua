@@ -15,7 +15,7 @@
         "Source/Style.h",
     },
     ["Manual"] = {
-        "License.md",
+        "License",
         "ReadMe.md"
     }
 }

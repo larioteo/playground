@@ -8,7 +8,9 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <string_view>
 #include <sstream>
+#include <type_traits>
 
 #include "Core.h"
 
@@ -48,9 +50,11 @@ enum class LogLevel {
     Delimiter	= 0x9,	// Structure the log with a delimiter
 };
 
+// Concepts
 template <typename T>
 concept typename_logmodifier = std::is_same_v<T, LogLevel>;
 
+// Overrides
 template <typename_logmodifier T>
 inline std::ostream &operator<<(std::ostream &os, T type) {
     return os << static_cast<size_t>(type);
@@ -73,63 +77,51 @@ class Log {
 public:
     template <typename T>
     Log &operator<<(const T &data) {
+        std::unique_lock<mutex> lock(mSync);
         if (mSkip) return (*this);
-        std::unique_lock<mutex> lock(Sync);
 
-        // Automatically reset to default color after newline
-        if constexpr (std::is_same_v<T, const char *>) {
+        if constexpr (is_string_v<T>) {
             if (String::EndsWith(data, "\n")) {
-                if (CaptionActive) {
-                    CaptionActive = false;
-                    stream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+                if (mCaptionActive) {
+                    mCaptionActive = false;
+                    mStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
                 }
-                stream << Cli::Style::Reset << Cli::Color::White;
-                Counter++;
+
+                Reset();
+                mCounter++;
             }
         }
 
-        // Stream data
-        stream << data;
+        mStream << data;
         return (*this);
     }
-    Log &operator<<(ostream &(*T)(ostream &)) {
-        if (CaptionActive) {
-            stream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
-            CaptionActive = false;
-        }
-        mSkip = false;
-        stream << Cli::Style::Reset << Cli::Color::White << T;
-        return (*this);
-    }
-
+    
     template <typename_logmodifier T>
     Log &operator<<(const T &data) {
-        std::unique_lock<mutex> lock(Sync);
-        //Sync.lock();
-        //Sync.unlock();
-
+        std::unique_lock<mutex> lock(mSync);
+        
         if constexpr (std::is_same_v<T, LogLevel>) {
             if (data >= mLogLevel) {
                 mSkip = false;
                 switch (data) {
-                    case LogLevel::Fatal:	    { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::Red				<< "[ Fatal ] ";    break; }
-                    case LogLevel::Error:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightRed		    << "[ Error ] ";    break; }
-                    case LogLevel::Warn:        { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightYellow		<< "[ Warn  ] ";    break; }
-                    case LogLevel::Info:        { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGray		<< "[ Info  ] ";    break; }
-                    case LogLevel::Debug:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGreen		<< "[ Debug ] ";    break; }
-                    case LogLevel::Trace:       { stream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightMagenta	    << "[ Trace ] ";    break; }
+                    case LogLevel::Fatal:	    { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::Red				<< "[ Fatal ] ";    break; }
+                    case LogLevel::Error:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightRed		<< "[ Error ] ";    break; }
+                    case LogLevel::Warn:        { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightYellow		<< "[ Warn  ] ";    break; }
+                    case LogLevel::Info:        { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGray		<< "[ Info  ] ";    break; }
+                    case LogLevel::Debug:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGreen		<< "[ Debug ] ";    break; }
+                    case LogLevel::Trace:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightMagenta    << "[ Trace ] ";    break; }
 
                     case LogLevel::Caption:     {
-                        CaptionActive = true;
-                        stream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mCaptionActive = true;
+                        mStream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
                         break;
                     }
                     case LogLevel::Delimiter:   {
-                        stream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
+                        mStream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
                         break;
                     }
                     
-                    default:                    { stream << Cli::Color::White;  break; }
+                    default:                    { mStream << Cli::Color::White;  break; }
                 }
             } else {
                 mSkip = true;
@@ -138,15 +130,40 @@ public:
 
         return (*this);
     }
+   
+    Log &operator<<(ostream &(*T)(ostream &)) {
+        std::unique_lock<mutex> lock(mSync);
+        if (mSkip) return (*this);
+
+        if (mCaptionActive) {
+            mStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+            mCaptionActive = false;
+        }
+        
+        Reset();
+        mCounter++;
+
+        mStream << T;
+        return (*this);
+    }
+
+    // Accessors
+    size_t GetCounter() const { return mCounter; }
+    LogLevel GetLevel() const { return mLogLevel; }
+
+    // Mutators
+    void SetLevel(const LogLevel level) { mLogLevel = level; }
 
     // Methods
     static Log &Instance() {
         static Log instance;
         return instance;
     }
-
+    inline void Reset() {
+        mStream << Cli::Style::Reset << Cli::Color::White;
+    }
     static void Test() {
-        //Log::Instance() << LogLevel::Caption    << "Caption" << "\n";
+        Log::Instance() << LogLevel::Caption    << "Caption" << "\n";
         Log::Instance() << LogLevel::Default    << "Default" << "\n";
         Log::Instance() << LogLevel::Delimiter;
         
@@ -165,18 +182,33 @@ public:
             << Cli::Color::LightGreen   << "color" << Cli::Color::LightCyan << "-"
             << Cli::Color::LightBlue    << "test"
             << Cli::Color::Default      << "!\n";
+
+
+        char Char[] = "Char *\n";
+        const char *ConstChar = "ConstChar *\n";
+        //wchar_t WChar_T[] = L"WChar_T *\n";
+        //const wchar_t *ConstWChar_T = L"ConstWChar_T *\n";
+        std::string String = "String\n";
+        //std::wstring WString = L"WString\n";
+
+        Log::Instance() << Cli::Color::LightBlue << Char;
+        Log::Instance() << Cli::Color::LightBlue << ConstChar;
+        //Log::Instance() << Cli::Color::LightBlue << WChar_T;
+        //Log::Instance() << Cli::Color::LightBlue << ConstWChar_T;
+        Log::Instance() << Cli::Color::LightBlue << String;
+        //Log::Instance() << Cli::Color::LightBlue << WString;
+        Log::Instance() << Cli::Color::LightBlue << std::endl;
     }
 
+private:
     // Properties
     LogLevel mLogLevel = LogLevel::Trace;
-    size_t Counter = 0;
-
-private:
-    ostream &stream = std::cout;
-    mutex Sync;
+    ostream &mStream = std::cout;
+    mutex mSync;
 
     // States
-    bool CaptionActive = false;
+    size_t mCounter = 0;
+    bool mCaptionActive = false;
     bool mLevelActive = false;
     bool mSkip = false;
 };
@@ -196,9 +228,10 @@ template<typename ...Args> void AppLogWarning(Args &&...args)   { applog << LogL
 template<typename ...Args> void AppLogError(Args &&...args)		{ applog << LogLevel::Error	    ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogLevel::Fatal     ; (applog << ... << args); applog << "\n"; throw std::runtime_error(""); }
 
+// ToDo: Not working as before in a module, maybe a default override will be needed...
 #define APP_LOG(...)			AppLog			("[", __FUNCTION__, "]: ", __VA_ARGS__)
-//#define APP_LOG_TRACE(...)		AppLogTrace		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-//#define APP_LOG_DEBUG(...)		AppLogDebug		("[", __FUNCTION__, "]: ", __VA_ARGS__)
+#define APP_LOG_TRACE(...)      AppLogTrace		("[", __FUNCTION__, "]: ", __VA_ARGS__)
+#define APP_LOG_DEBUG(...)      AppLogDebug		("[", __FUNCTION__, "]: ", __VA_ARGS__)
 #define APP_LOG_INFO(...)		AppLogInfo		("[", __FUNCTION__, "]: ", __VA_ARGS__)
 #define APP_LOG_WARN(...)		AppLogWarning	("[", __FUNCTION__, "]: ", __VA_ARGS__)
 #define APP_LOG_ERROR(...)		AppLogError		("[", __FUNCTION__, "]: ", __VA_ARGS__)
@@ -225,8 +258,6 @@ template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogL
     
     // Old-School: If anybody wishes preprocessor macros, we have no problem with it.
     #define APP_ASSERT(x, ...)		{ if(!(x)) { AppLogCritical("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
-    #define APP_LOG_DEBUG(...)		AppLogDebug		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-    #define APP_LOG_TRACE(...)		AppLogTrace		("[", __FUNCTION__, "]: ", __VA_ARGS__)
 #else
     // ToDo: Should we use empty functions or replace everything with nothing with the preprocesor?
     //template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {}
@@ -251,8 +282,8 @@ template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogL
     //#define AppLogWarning(...);
     //#define AppLogError(...);
     //#define AppLogCritical(...);
-    #define AppLogDebug(...);
-    #define AppLogTrace(...);
+    //#define AppLogDebug(...);
+    //#define AppLogTrace(...);
 
     // Old-School
     #define APP_ASSERT(x, ...);
@@ -261,8 +292,8 @@ template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogL
     //#define APP_LOG_WARN(...);	
     //#define APP_LOG_ERROR(...);	
     //#define APP_LOG_CRITICAL(...);
-    #define APP_LOG_DEBUG(...);
-    #define APP_LOG_TRACE(...);
+    //#define APP_LOG_DEBUG(...);
+    //#define APP_LOG_TRACE(...);
 #endif
 
 }

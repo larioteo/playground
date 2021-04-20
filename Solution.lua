@@ -29,6 +29,6 @@ workspace "Solution"
         defines { "APP_MODE_RELEASE" }
     
     filter { "configurations:Distribution" }
-        defines { "APP_MODE_RELEASE" }
+        defines { "APP_MODE_DISTRIBUTION" }
     
     filter {}
