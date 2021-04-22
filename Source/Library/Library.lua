@@ -8,7 +8,8 @@
     cppdialect "C++Latest"
     cppmodules "true"
     toolset "msc"
-
+    
+    debugdir "%{wks.location}/Build/%{cfg.buildcfg}"
     files { "**.h", "**.cpp", "**.ixx" }
 
     filter { "configurations:Debug" }

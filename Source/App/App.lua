@@ -9,6 +9,7 @@
     nativewchar "on"
     toolset "msc"
 		
+    debugdir "%{wks.location}/Build/%{cfg.buildcfg}"
     dependson { "Library" }
     entrypoint "mainCRTStartup"
 

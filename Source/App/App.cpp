@@ -32,6 +32,7 @@ public:
         // Single-Threaded
         auto durationST = TestST();
         applog << "Single-Threaded[" << applog.GetCounter() << "]: " << durationST << "ms\n";
+        AppAssert(false, "Assert");
 
         // Multi-Threaded
         auto future1 = std::async(std::launch::async, TestMT);
@@ -54,10 +55,12 @@ public:
             << " - Release:     " << Solution::AppRelease << "\n"
             << " - Version:     " << Solution::AppVersion << "\n"
             << "\n";
+
         // Log
         applog << LogLevel::Default << Cli::Color::White << "Hello " << Cli::Color::Blue << "Wo" << Cli::Color::Red << "rl" << Cli::Color::Yellow << "d!" << std::endl;
         AppLogInfo("Info");
         applog << Cli::Color::Red << "Haha\n";
+        //applog.SetLevel(LogLevel::Default);
 
         /// System
         // Cli
@@ -88,11 +91,11 @@ public:
     static double TestMT() {
         auto timer = Timer();
 
-        const auto Iterations = 1000;
+        const auto Iterations = 20000;
 
         // Default
         for (int i = 0; i <= Iterations; i++) {
-            applog << LogLevel::Default << "." << Cli::Style::Reset;
+            applog << LogLevel::Default << "" << Cli::Style::Reset;
         }
         applog << std::endl;
 

@@ -1,18 +1,14 @@
 ﻿module;
 
-#include <atomic>
 #include <filesystem>
 #include <mutex>
 #include <fstream>
 #include <iostream>
-#include <memory>
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <string_view>
-#include <sstream>
 #include <type_traits>
-
-#include "Core.h"
 
 export module Ultra.Log;
 
@@ -20,14 +16,13 @@ import Ultra.System.Cli;
 import Ultra.Utility.DateTime;
 import Ultra.Utility.String;
 
+using std::cout;
 using std::is_same_v;
 using std::mutex;
 using std::ofstream;
 using std::ostream;
 using std::string;
 using std::stringstream;
-
-using namespace std::string_literals;
 
 export namespace Ultra {
 
@@ -56,72 +51,94 @@ concept typename_logmodifier = std::is_same_v<T, LogLevel>;
 
 // Overrides
 template <typename_logmodifier T>
-inline std::ostream &operator<<(std::ostream &os, T type) {
+inline ostream &operator<<(ostream &os, T type) {
     return os << static_cast<size_t>(type);
 }
 
 ///
-/// @brief This logging class fullfills basic needs, it takes everything you throw at it (like cout), and offers you some nice colors and similar features like that.
+/// @brief This logger fullfillsa all basic needs, it takes everything you throw at it (like cout), and offers easy to use features like colors, styles, etc.
 ///
 class Log {
     // Constructors and Deconstructor
     Log() { if (mLogLevel > LogLevel::Fatal) mLogLevel = LogLevel::Fatal; }
+
+public:
+    static Log &Instance() {
+        static Log instance;
+        return instance;
+    }
     Log(const Log &) = delete;
     Log(Log &&) noexcept = delete;
-    ~Log() = default;
+    ~Log() { Close(); };
 
     // Operators
     Log &operator=(const Log &) { return Instance(); }
-    Log &operator=(const Log &&) noexcept { return Instance(); }
+    Log &operator=(Log &&) noexcept { return Instance(); }
 
-public:
-    template <typename T>
-    Log &operator<<(const T &data) {
+    // Accessors
+    const size_t &GetCounter() const { return mCounter; }
+    const LogLevel &GetLevel() const { return mLogLevel; }
+
+    // Mutators
+    void SetLevel(const LogLevel level) {
         std::unique_lock<mutex> lock(mSync);
-        if (mSkip) return (*this);
-
-        if constexpr (is_string_v<T>) {
-            if (String::EndsWith(data, "\n")) {
-                if (mCaptionActive) {
-                    mCaptionActive = false;
-                    mStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
-                }
-
-                Reset();
-                mCounter++;
-            }
-        }
-
-        mStream << data;
-        return (*this);
+        mLogLevel = level;
     }
-    
+
+    // Methos
     template <typename_logmodifier T>
-    Log &operator<<(const T &data) {
+    Log &operator<<(T &&data) {
         std::unique_lock<mutex> lock(mSync);
-        
+
         if constexpr (std::is_same_v<T, LogLevel>) {
             if (data >= mLogLevel) {
                 mSkip = false;
+                auto timestamp = apptime.GetTimeStamp("%Y-%m-%dT%H:%M");
                 switch (data) {
-                    case LogLevel::Fatal:	    { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::Red				<< "[ Fatal ] ";    break; }
-                    case LogLevel::Error:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightRed		<< "[ Error ] ";    break; }
-                    case LogLevel::Warn:        { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightYellow		<< "[ Warn  ] ";    break; }
-                    case LogLevel::Info:        { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGray		<< "[ Info  ] ";    break; }
-                    case LogLevel::Debug:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightGreen		<< "[ Debug ] ";    break; }
-                    case LogLevel::Trace:       { mStream << Cli::Color::Gray << apptime.GetTimeStamp("%Y-%m-%dT%H:%M") << " | " << Cli::Color::LightMagenta    << "[ Trace ] ";    break; }
+                    case LogLevel::Fatal: {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
+                        break;
+                    }
+                    case LogLevel::Error:       {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
+                        break;
+                    }
+                    case LogLevel::Warn: {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
+                        break; }
+                    case LogLevel::Info: {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray	    << "[ Info  ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray		<< "[ Info  ] ";
+                        break; }
+                    case LogLevel::Debug: {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
+                        break; }
+                    case LogLevel::Trace: {
+                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
+                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
+                        break; }
 
                     case LogLevel::Caption:     {
                         mCaptionActive = true;
-                        mStream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mStream     << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mFileStream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
                         break;
                     }
-                    case LogLevel::Delimiter:   {
-                        mStream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
+                    case LogLevel::Delimiter: {
+                        mStream     << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
+                        mFileStream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
                         break;
                     }
-                    
-                    default:                    { mStream << Cli::Color::White;  break; }
+
+                    default: {
+                        mStream     << Cli::Color::White;
+                        mFileStream << Cli::Color::White;
+                        break;
+                    }
                 }
             } else {
                 mSkip = true;
@@ -130,38 +147,53 @@ public:
 
         return (*this);
     }
-   
+
+    template <typename T>
+    Log &operator<<(T &&data) {
+        std::unique_lock<mutex> lock(mSync);
+        if (mSkip) return (*this);
+        if (!mFileStream.is_open()) { Open(); }
+        std::unique_ptr<stringstream> file { new stringstream };
+
+        if constexpr (is_string_v<T>) {
+            if (String::EndsWith(data, "\n")) {
+                if (mCaptionActive) {
+                    mCaptionActive = false;
+                    mStream     << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+                    mFileStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+                }
+
+                mStream     << Cli::Style::Reset << Cli::Color::White;
+                mFileStream << Cli::Style::Reset << Cli::Color::White;
+                mCounter++;
+            }
+        }
+
+        mStream     << std::forward<T>(data);
+        mFileStream << std::forward<T>(data);
+        return (*this);
+    }
+
     Log &operator<<(ostream &(*T)(ostream &)) {
         std::unique_lock<mutex> lock(mSync);
         if (mSkip) return (*this);
 
         if (mCaptionActive) {
-            mStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+            mStream     << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+            mFileStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
             mCaptionActive = false;
         }
-        
-        Reset();
+
+        mStream     << Cli::Style::Reset << Cli::Color::White;
+        mFileStream << Cli::Style::Reset << Cli::Color::White;
         mCounter++;
 
-        mStream << T;
+        mStream     << T;
+        mFileStream << T;
         return (*this);
     }
 
-    // Accessors
-    size_t GetCounter() const { return mCounter; }
-    LogLevel GetLevel() const { return mLogLevel; }
-
-    // Mutators
-    void SetLevel(const LogLevel level) { mLogLevel = level; }
-
     // Methods
-    static Log &Instance() {
-        static Log instance;
-        return instance;
-    }
-    inline void Reset() {
-        mStream << Cli::Style::Reset << Cli::Color::White;
-    }
     static void Test() {
         Log::Instance() << LogLevel::Caption    << "Caption" << "\n";
         Log::Instance() << LogLevel::Default    << "Default" << "\n";
@@ -201,10 +233,32 @@ public:
     }
 
 private:
+    // Log-File Handling
+    void Open(const std::filesystem::path &object = "./Test.log") {
+        auto directory = object.parent_path();
+        if (!directory.empty()) std::filesystem::create_directories(directory);
+        mFileStream.open(object);
+        mFileStream << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n";
+        mFileStream << "  ____ ___.__   __                    _________                    __                  \n";
+        mFileStream << " |    |   \  |_/  |_____________     /   _____/_____   ____  _____/  |_____________    \n";
+        mFileStream << " |    |   /  |\   __\_  __ \__  \    \_____  \\____ \_/ __ \/ ___\   __\_  __ \__  \   \n";
+        mFileStream << " |    |  /|  |_|  |  |  | \// __ \_  /        \  |_> >  ___|  \___|  |  |  | \// __ \_ \n";
+        mFileStream << " |______/ |____/__|  |__|  (____  / /_______  /   __/ \___  >___  >__|  |__|  (____  / \n";
+        mFileStream << "                                \/          \/|__|        \/    \/                 \/  \n";
+        mFileStream << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n";
+    }
+    void Close() {
+        mFileStream << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n";
+        mFileStream.close();
+    }
+
     // Properties
+    string LogFile = "./Log/Ultra.log";
     LogLevel mLogLevel = LogLevel::Trace;
-    ostream &mStream = std::cout;
+    ofstream mFileStream;
+    ostream &mStream = cout;
     mutex mSync;
+    mutex mSyncFile;
 
     // States
     size_t mCounter = 0;
@@ -213,13 +267,15 @@ private:
     bool mSkip = false;
 };
 
-// This is the preferred instance to the logging class.
+// These are the global instances to the logger
 Log &applog = Ultra::Log::Instance();
+Log &logger = applog;
 
 ///
-/// @brief  As good as the logging class can be, we need something for applications where performance matters. Therefore the following function templates
-///         are for convenience, they will help removing unaccessary code in distribution builds.
+/// @brief  As good as a logger can be, we need something for applications where performance matters. Therefore these function templates are for convenience,
+/// they will help removing unaccessary code in release and distribution builds, therefore they also override the log levels.
 ///
+// ToDo: Decide empty functions vs empty code (either works just fine)?
 template<typename ...Args> void AppLog(Args &&...args)			{ applog << LogLevel::Default   ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogTrace(Args &&...args)		{ applog << LogLevel::Trace     ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogDebug(Args &&...args)		{ applog << LogLevel::Debug     ; (applog << ... << args); applog << "\n"; }
@@ -228,72 +284,39 @@ template<typename ...Args> void AppLogWarning(Args &&...args)   { applog << LogL
 template<typename ...Args> void AppLogError(Args &&...args)		{ applog << LogLevel::Error	    ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogLevel::Fatal     ; (applog << ... << args); applog << "\n"; throw std::runtime_error(""); }
 
-// ToDo: Not working as before in a module, maybe a default override will be needed...
-#define APP_LOG(...)			AppLog			("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_TRACE(...)      AppLogTrace		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_DEBUG(...)      AppLogDebug		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_INFO(...)		AppLogInfo		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_WARN(...)		AppLogWarning	("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_ERROR(...)		AppLogError		("[", __FUNCTION__, "]: ", __VA_ARGS__)
-#define APP_LOG_FATAL(...)	    AppLogFatal	    ("[", __FUNCTION__, "]: ", __VA_ARGS__)
-
-#ifdef APP_DEBUG_MODE
+#if APP_MODE_DEBUG
     template<typename T, typename ...Args> bool AppAssert(T *object, Args &&...args) {
         if (!object) {
-            applog << Log::Critical; (applog << ... << args); applog << "\n";
+            applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
             return true;
         }
         return false;
     }
     template<typename T, typename ...Args> bool AppAssert(T object, Args &&...args) {
         if (!object) {
-            applog << Log::Critical; (applog << ... << args); applog << "\n";
+            applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
             return true;
         }
         return false;
     }
-    #define AppAssert(x, ...) if(AppAssert(x, __VA_ARGS__)) APP_DEBUGBREAK() // Workaround, at the debug break after the message.
-    template<typename ...Args> void AppLogDebug(Args &&...args)		{ applog << Log::Debug		; (applog << ... << args); applog << "\n"; }
-    template<typename ...Args> void AppLogTrace(Args &&...args)		{ applog << Log::Trace		; (applog << ... << args); applog << "\n"; }
-    
-    // Old-School: If anybody wishes preprocessor macros, we have no problem with it.
-    #define APP_ASSERT(x, ...)		{ if(!(x)) { AppLogCritical("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
-#else
-    // ToDo: Should we use empty functions or replace everything with nothing with the preprocesor?
-    //template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {}
-    //template<typename ...Args> void AppLog(Args &&...args)			{}
-    //template<typename ...Args> void AppLogInfo(Args &&...args)		{}
-    //template<typename ...Args> void AppLogWarning(Args &&...args)		{}
-    //template<typename ...Args> void AppLogError(Args &&...args)		{}
-    //template<typename ...Args> void AppLogCritical(Args &&...args)	{}
-    //template<typename ...Args> void AppLogDebug(Args &&...args)		{}
-    //template<typename ...Args> void AppLogTrace(Args &&...args)		{}
+    #define AppAssert(x, ...) if(AppAssert(x, __VA_ARGS__)) APP_DEBUGBREAK() // Workaround, add the debug break after the message.
+#elif APP_MODE_RELEASE
     // ToDo: Should the application get killed if something goes "very" wrong, or stay up?
+    template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {}
     //template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {
     //	if (!object) {
-    //		applog << Log::Critical; (applog << ... << args); applog << "\n";
+    //		applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
     //		std::abort();
     //	}
     //}
-    // Either works just fine...
-    #define AppAssert(...);
-    //#define AppLog(...);
-    //#define AppLogInfo(...);
-    //#define AppLogWarning(...);
-    //#define AppLogError(...);
-    //#define AppLogCritical(...);
+    template<typename ...Args> void AppLogTrace(Args &&...args)		{}
+    template<typename ...Args> void AppLogDebug(Args &&...args)		{}
+    //#define AppAssert(...);
     //#define AppLogDebug(...);
     //#define AppLogTrace(...);
-
-    // Old-School
-    #define APP_ASSERT(x, ...);
-    //#define APP_LOG(...);
-    //#define APP_LOG_INFO(...);
-    //#define APP_LOG_WARN(...);	
-    //#define APP_LOG_ERROR(...);	
-    //#define APP_LOG_CRITICAL(...);
-    //#define APP_LOG_DEBUG(...);
-    //#define APP_LOG_TRACE(...);
+#elif APP_MODE_DISTRIBUTION
+    template<typename ...Args> void AppLogInfo(Args &&...args)		{}
+    //#define AppLogInfo(...);
 #endif
 
 }

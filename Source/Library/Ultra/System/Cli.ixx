@@ -2,6 +2,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <fstream>
 #include <ostream>
 
 export module Ultra.System.Cli;
@@ -94,8 +95,13 @@ concept typename_Climodifier =
     std::is_same_v<T, Ultra::Cli::Style>;
 
 template <typename_Climodifier T>
-inline std::ostream &operator<<(std::ostream &os, T type) {
-    return os << "\x1b[" << static_cast<int>(type) << "m";
+std::ostream &operator<<(std::ostream &stream, T type) {
+    return stream << "\x1b[" << static_cast<int>(type) << "m";
+}
+
+template <typename_Climodifier T>
+std::ofstream &operator<<(std::ofstream &stream, T type) {
+    return stream;
 }
 
 void Test() {
