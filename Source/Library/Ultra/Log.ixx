@@ -84,6 +84,10 @@ public:
         std::unique_lock<mutex> lock(mSync);
         mLogLevel = level;
     }
+    void SetLogFile(const std::string_view object) {
+        std::unique_lock<mutex> lock(mSync);
+        LogFile = object;
+    }
 
     // Methos
     template <typename_logmodifier T>
@@ -96,47 +100,46 @@ public:
                 auto timestamp = apptime.GetTimeStamp("%Y-%m-%dT%H:%M");
                 switch (data) {
                     case LogLevel::Fatal: {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Fatal ] ";
                         break;
                     }
                     case LogLevel::Error:       {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Error ] ";
                         break;
                     }
                     case LogLevel::Warn: {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Warn  ] ";
                         break; }
                     case LogLevel::Info: {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray	    << "[ Info  ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray		<< "[ Info  ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray	    << "[ Info  ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Info  ] ";
                         break; }
                     case LogLevel::Debug: {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Debug ] ";
                         break; }
                     case LogLevel::Trace: {
-                        mStream     << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
-                        mFileStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Trace ] ";
                         break; }
 
                     case LogLevel::Caption:     {
                         mCaptionActive = true;
-                        mStream     << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
-                        mFileStream << Cli::Color::LightBlue << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mStream << Cli::Color::LightBlue    << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mFileStream                         << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
                         break;
                     }
                     case LogLevel::Delimiter: {
-                        mStream     << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
-                        mFileStream << Cli::Color::Yellow    << "----------------------------------------------------------------\n";
+                        mStream << Cli::Color::Yellow       << "----------------------------------------------------------------\n";
+                        mFileStream                         << "----------------------------------------------------------------\n";
                         break;
                     }
 
                     default: {
-                        mStream     << Cli::Color::White;
-                        mFileStream << Cli::Color::White;
+                        mStream << Cli::Color::White;
                         break;
                     }
                 }
@@ -163,13 +166,12 @@ public:
                     mFileStream << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
                 }
 
-                mStream     << Cli::Style::Reset << Cli::Color::White;
-                mFileStream << Cli::Style::Reset << Cli::Color::White;
+                mStream << Cli::Style::Reset << Cli::Color::White;
                 mCounter++;
             }
         }
 
-        mStream     << std::forward<T>(data);
+        mStream << std::forward<T>(data);
         mFileStream << std::forward<T>(data);
         return (*this);
     }
@@ -184,11 +186,10 @@ public:
             mCaptionActive = false;
         }
 
-        mStream     << Cli::Style::Reset << Cli::Color::White;
-        mFileStream << Cli::Style::Reset << Cli::Color::White;
+        mStream << Cli::Style::Reset << Cli::Color::White;
         mCounter++;
 
-        mStream     << T;
+        mStream << T;
         mFileStream << T;
         return (*this);
     }
@@ -234,17 +235,19 @@ public:
 
 private:
     // Log-File Handling
-    void Open(const std::filesystem::path &object = "./Test.log") {
+    void Open() {
+        std::filesystem::path object = LogFile;
         auto directory = object.parent_path();
         if (!directory.empty()) std::filesystem::create_directories(directory);
+
         mFileStream.open(object);
         mFileStream << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n";
-        mFileStream << "  ____ ___.__   __                    _________                    __                  \n";
-        mFileStream << " |    |   \  |_/  |_____________     /   _____/_____   ____  _____/  |_____________    \n";
-        mFileStream << " |    |   /  |\   __\_  __ \__  \    \_____  \\____ \_/ __ \/ ___\   __\_  __ \__  \   \n";
-        mFileStream << " |    |  /|  |_|  |  |  | \// __ \_  /        \  |_> >  ___|  \___|  |  |  | \// __ \_ \n";
-        mFileStream << " |______/ |____/__|  |__|  (____  / /_______  /   __/ \___  >___  >__|  |__|  (____  / \n";
-        mFileStream << "                                \/          \/|__|        \/    \/                 \/  \n";
+        mFileStream << R"(  ____ ___.__   __                    _________                    __                  )" << "\n";
+        mFileStream << R"( |    |   \  |_/  |_____________     /   _____/_____   ____  _____/  |_____________    )" << "\n";
+        mFileStream << R"( |    |   /  |\   __\_  __ \__  \    \_____  \\____ \_/ __ \/ ___\   __\_  __ \__  \   )" << "\n";
+        mFileStream << R"( |    |  /|  |_|  |  |  | \// __ \_  /        \  |_> >  ___|  \___|  |  |  | \// __ \_ )" << "\n";
+        mFileStream << R"( |______/ |____/__|  |__|  (____  / /_______  /   __/ \___  >___  >__|  |__|  (____  / )" << "\n";
+        mFileStream << R"(                                \/          \/|__|        \/    \/                 \/  )" << "\n";
         mFileStream << "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■\n";
     }
     void Close() {
@@ -253,7 +256,7 @@ private:
     }
 
     // Properties
-    string LogFile = "./Log/Ultra.log";
+    string LogFile = "./Log/Ultra-Spectra.log";
     LogLevel mLogLevel = LogLevel::Trace;
     ofstream mFileStream;
     ostream &mStream = cout;
