@@ -7,6 +7,11 @@
 
 export module Ultra.System.Library;
 
+///
+/// @brief Load dynamic library (module)
+/// @note under construction!
+/// 
+
 export namespace Ultra {
 
 typedef void (*TestEXT)(void);

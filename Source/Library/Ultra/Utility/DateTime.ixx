@@ -12,6 +12,8 @@ export module Ultra.Utility.DateTime;
 using namespace std::chrono;
 using namespace std::chrono_literals;
 
+export using namespace std::literals::chrono_literals;
+
 export namespace Ultra { namespace Utility {
 
 class DateTime {

@@ -4,6 +4,11 @@
 
 import Ultra.Application;
 
+///
+/// @brief Application EntryPoint
+/// Attention: Can be used only once!
+///
+
 extern Ultra::Application *CreateApplication();
 
 int main(int argc, char **argv) {

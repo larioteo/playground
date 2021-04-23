@@ -3,6 +3,12 @@
 #include "Platform.h"
 #include "Types.h"
 
+import Ultra.Log;
+
+///
+/// @brief Library Extensions
+///
+
 #ifdef APP_PLATFORM_WINDOWS
     #ifdef APP_SHARED_LIBRARY
         #define APP_API __declspec(dllexport)
@@ -27,6 +33,10 @@
 	#define APP_DEBUGBREAK()
 #endif
 
+///
+/// @brief Logger Extensions (cause performance matters ... sometimes)
+///
+
 // Old-School: If anybody wishes preprocessor macros, we have no problem with it.
 #define APP_LOG(...)			AppLog			("[", __FUNCTION__, "]: ", __VA_ARGS__)
 #define APP_LOG_TRACE(...)      AppLogTrace		("[", __FUNCTION__, "]: ", __VA_ARGS__)
@@ -37,11 +47,33 @@
 #define APP_LOG_FATAL(...)	    AppLogFatal	    ("[", __FUNCTION__, "]: ", __VA_ARGS__)
 
 #ifdef APP_MODE_DEBUG
-    #define APP_ASSERT(x, ...)		{ if(!(x)) { AppLogCritical("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
+    #define AppAssert(x, ...) if(AppAssert(x, __VA_ARGS__)) APP_DEBUGBREAK() // Workaround, add the debug break after the message.
+
+    #define APP_ASSERT(x, ...) { if(!(x)) { AppLogCritical("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
 #elif APP_MODE_RELEASE
+    #ifdef LIB_SETTING_REPLACE_LOGGER
+        #define AppAssert(...);
+ 
+        #define AppLogDebug(...);
+        #define AppLogTrace(...);
+    #endif
+    
     #define APP_ASSERT(x, ...);
-    #define APP_LOG_TRACE(...);
+
     #define APP_LOG_DEBUG(...);
+    #define APP_LOG_TRACE(...);
 #elif APP_MODE_DISTRIBUTION
+    #ifdef LIB_SETTING_REPLACE_LOGGER
+        #define AppAssert(...);
+ 
+        #define AppLogInfo(...);
+        #define AppLogDebug(...);
+        #define AppLogTrace(...);
+    #endif
+    
+    #define APP_ASSERT(x, ...);
+
     #define APP_LOG_INFO(...);
+    #define APP_LOG_DEBUG(...);
+    #define APP_LOG_TRACE(...);
 #endif

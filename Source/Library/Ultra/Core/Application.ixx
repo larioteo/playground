@@ -8,6 +8,11 @@
 //#include "Omnia/UI/GuiLayer.h"
 //#include "Omnia/UI/Window.h"
 
+#include <queue>
+#include <future>
+#include <functional>
+
+
 export module Ultra.Application;
 
 import Ultra.Layer;
@@ -17,6 +22,9 @@ import Ultra.Utility.DateTime;
 import Ultra.Utility.Timer;
 
 export namespace Ultra {
+
+using std::function;
+using std::future;
 
 // The title, resolution and graphics API can be passed as structure.
 struct ApplicationProperties {
@@ -53,8 +61,8 @@ private:
 class Application {
     // Types
     struct Statistics {
-        std::queue<float> fpsData;
-        std::queue<float> msPFData;
+        //std::queue<float> fpsData;
+        //std::queue<float> msPFData;
 
         double fps = {};
         double msPF = {};
@@ -73,6 +81,9 @@ public:
         applog << "... at: " << apptime.GetIsoTime() << "\n";
         pAppInstance = this;
         mProperties = properties;
+
+        logger << "Hallo Haubi";
+        AppLog("Hallo", "Hallo", "Hallo");
 
         // Initialization
         applog << LogLevel::Caption << "Initialization" << "\n";

@@ -1,7 +1,7 @@
 ﻿project "App"
     defines { "PROJECT_NAME=App" }
     language "C++"
-	characterset "Unicode"
+    characterset "Unicode"
     confromancemode "true"
     cdialectx "C17"
     cppdialect "C++Latest"
@@ -13,9 +13,9 @@
     dependson { "Library" }
     entrypoint "mainCRTStartup"
 
-	links { "Library" }
+    links { "Library" }
 
-    files { "**.h", "**.cpp", "**.cppm", "**.ixx" }
+    files { "**.h", "**.cpp", "**.cppm", "**.inl", "**.ixx" }
     
 	includedirs {
 		"%{Headers.Library}"

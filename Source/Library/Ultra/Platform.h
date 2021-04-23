@@ -1,18 +1,23 @@
 ﻿#pragma once
 
-/*
-	These values are used to control platform specific features like window creation.
-*/
+///
+/// @brief These values are used to control platform specific features during compilation.
+///
+
 namespace Ultra {
-/*
-	Preprocessor Utilities
-*/
+
+///
+/// Preprocessor Utilities
+///
+
+// String
 #define STRINGIZE(s) #s
 #define TOSTRING(s) STRINGIZE(s)
 
-/*
-    Properties
-*/
+///
+/// Properties
+///
+
 // Compiler
 #if defined(_MSC_VER)
 	#define APP_COMPILER_MSVC
@@ -21,6 +26,7 @@ namespace Ultra {
 	#define APP_COMPILER_MINOR		0
 	#define APP_COMPILER_PATCH		0
 	#define APP_COMPILER_VERSION	"v" TOSTRING(APP_COMPILER_MAJOR)
+    static constexpr auto AppCompiler = "MSVC";
 #elif defined(__clang__)
 	#define APP_COMPILER_CLANG
 	#define APP_COMPILER			"Clang"
@@ -28,6 +34,7 @@ namespace Ultra {
 	#define APP_COMPILER_MINOR		__clang_minor__
 	#define APP_COMPILER_PATCH		__clang_patchlevel__
 	#define APP_COMPILER_VERSION	"v" TOSTRING(APP_COMPILER_MAJOR) "." TOSTRING(APP_COMPILER_MINOR) "." TOSTRING(APP_COMPILER_PATCH)
+    static constexpr auto AppCompiler = "Clang";
 #elif defined(__EMSCRIPTEN__)
 	#define APP_COMPILER_EMSCRIPTEN
 	#define APP_COMPILER			"emscripten"
@@ -35,6 +42,7 @@ namespace Ultra {
 	#define APP_COMPILER_MINOR		0
 	#define APP_COMPILER_PATCH		0
 	#define APP_COMPILER_VERSION	"v" TOSTRING(APP_COMPILER_MAJOR) "." TOSTRING(APP_COMPILER_MINOR) "." TOSTRING(APP_COMPILER_PATCH)
+    static constexpr auto AppCompiler = "emscripten";
 #elif defined(__GNUC__)
 	#define APP_COMPILER_GNU
 	#define APP_COMPILER			"GCC"
@@ -42,6 +50,7 @@ namespace Ultra {
 	#define APP_COMPILER_MINOR		__GNUC_MINOR__
 	#define APP_COMPILER_PATCH		0
 	#define APP_COMPILER_VERSION	"v" TOSTRING(APP_COMPILER_MAJOR) "." TOSTRING(APP_COMPILER_MINOR)
+    static constexpr auto AppCompiler = "GCC";
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 	#define APP_COMPILER_MINGW
 	#define APP_COMPILER			"MinGW"
@@ -54,6 +63,7 @@ namespace Ultra {
 	#endif
 	#define APP_COMPILER_PATCH		0
 	#define APP_COMPILER_VERSION "v" TOSTRING(APP_COMPILER_MAJOR) "." TOSTRING(APP_COMPILER_MINOR)
+    static constexpr auto AppCompiler = "MinGW";
 #else
 	#define APP_COMPILER_UNKNOWN
 	#define APP_COMPILER			"Unknown"
@@ -61,8 +71,8 @@ namespace Ultra {
 	#define APP_COMPILER_MINOR		0
 	#define APP_COMPILER_PATCH		0
 	#define APP_COMPILER_VERSION	"v" TOSTRING(APP_COMPILER_MAJOR) "." TOSTRING(APP_COMPILER_MINOR) "." TOSTRING(APP_COMPILER_PATCH)
+    static constexpr auto AppCompiler = "Unknown";
 #endif
-
 
 // Platform
 #if defined(_WIN32) || defined(_WIN64)
@@ -107,7 +117,7 @@ namespace Ultra {
 
 // PlatformAPI
 #if defined(APP_PLATFORM_WINDOWS)
-	#define APP_PLATFORM_API_WIN32
+	#define APP_PLATFORM_API_WINAPI
 	#define APP_PLATFORM_API	"WinAPI"
 	static constexpr auto AppPlatformAPI = "WinAPI";
 #elif defined(APP_PLATFORM_BSD) || defined(APP_PLATFORM_LINUX) || defined(APP_PLATFORM_UNIX)
@@ -128,27 +138,4 @@ namespace Ultra {
 	static constexpr auto AppPlatformAPI = "Unknown";
 #endif
 
-// GraphicsAPI
-#if defined(APP_GRAPHICS_API_AUTO)
-	#if defined(APP_PLATFORM_WINDOWS)
-	#elif defined(APP_PLATFORM_BSD) || defined(APP_PLATFORM_LINUX) || defined(APP_PLATFORM_UNIX)
-	#elif defined(APP_PLATFORM_MACOSX)
-	#elif defined(APP_PLATFORM_WEB)
-	#else
-		#define APP_GRAPHICS_API_UNKNOWN
-		#define APP_GRAPHICS_API "Unknown"s
-		static constexpr auto AppGraphicsAPI = "Unknown"s;
-	#endif
-#else
-	#define APP_GRAPHICS_API_OPENGL
-	#define APP_GRAPHICS_API "OpenGL"
-#endif
-
-// ToDo: Support for other compilers and show only once
-#ifdef APP_COMPILER_MSVC_DISABLED
-	#pragma message("#> Compiler: " APP_COMPILER " [" APP_COMPILER_VERSION "]")
-	#pragma message("#> Platform: " APP_PLATFORM)
-	#pragma message("#> PlatformAPI: " APP_PLATFORM_API)
-	#pragma message("#> GraphicsAPI: " APP_GRAPHICS_API)
-#endif
 }

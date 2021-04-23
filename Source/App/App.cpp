@@ -1,10 +1,10 @@
 ﻿#include <Settings.h>
-#include <Ultra/EntryPoint.h>
 
 #include <future>
 
+#include <Ultra/EntryPoint.h>
+
 import Ultra;
-//import Ultra.EntryPoint; // ToDo: Check if it is possible to export the main function
 
 // Application
 namespace Ultra {
@@ -55,6 +55,7 @@ public:
             << " - Release:     " << Solution::AppRelease << "\n"
             << " - Version:     " << Solution::AppVersion << "\n"
             << "\n";
+        ShowLibraryInfo();
 
         // Log
         applog << LogLevel::Default << Cli::Color::White << "Hello " << Cli::Color::Blue << "Wo" << Cli::Color::Red << "rl" << Cli::Color::Yellow << "d!" << std::endl;

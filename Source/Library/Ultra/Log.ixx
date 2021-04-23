@@ -17,7 +17,6 @@ import Ultra.Utility.DateTime;
 import Ultra.Utility.String;
 
 using std::cout;
-using std::is_same_v;
 using std::mutex;
 using std::ofstream;
 using std::ostream;
@@ -156,7 +155,6 @@ public:
         std::unique_lock<mutex> lock(mSync);
         if (mSkip) return (*this);
         if (!mFileStream.is_open()) { Open(); }
-        std::unique_ptr<stringstream> file { new stringstream };
 
         if constexpr (is_string_v<T>) {
             if (String::EndsWith(data, "\n")) {
@@ -256,7 +254,7 @@ private:
     }
 
     // Properties
-    string LogFile = "./Log/Ultra-Spectra.log";
+    string LogFile = "nul";
     LogLevel mLogLevel = LogLevel::Trace;
     ofstream mFileStream;
     ostream &mStream = cout;
@@ -278,7 +276,6 @@ Log &logger = applog;
 /// @brief  As good as a logger can be, we need something for applications where performance matters. Therefore these function templates are for convenience,
 /// they will help removing unaccessary code in release and distribution builds, therefore they also override the log levels.
 ///
-// ToDo: Decide empty functions vs empty code (either works just fine)?
 template<typename ...Args> void AppLog(Args &&...args)			{ applog << LogLevel::Default   ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogTrace(Args &&...args)		{ applog << LogLevel::Trace     ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogDebug(Args &&...args)		{ applog << LogLevel::Debug     ; (applog << ... << args); applog << "\n"; }
@@ -287,10 +284,12 @@ template<typename ...Args> void AppLogWarning(Args &&...args)   { applog << LogL
 template<typename ...Args> void AppLogError(Args &&...args)		{ applog << LogLevel::Error	    ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogLevel::Fatal     ; (applog << ... << args); applog << "\n"; throw std::runtime_error(""); }
 
+// ToDo: Should the application get killed if something goes "very" wrong, or stay up?
 #if APP_MODE_DEBUG
     template<typename T, typename ...Args> bool AppAssert(T *object, Args &&...args) {
         if (!object) {
             applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
+            //std::abort();
             return true;
         }
         return false;
@@ -298,28 +297,24 @@ template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogL
     template<typename T, typename ...Args> bool AppAssert(T object, Args &&...args) {
         if (!object) {
             applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
+            //std::abort();
             return true;
         }
         return false;
     }
-    #define AppAssert(x, ...) if(AppAssert(x, __VA_ARGS__)) APP_DEBUGBREAK() // Workaround, add the debug break after the message.
 #elif APP_MODE_RELEASE
-    // ToDo: Should the application get killed if something goes "very" wrong, or stay up?
     template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {}
-    //template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {
-    //	if (!object) {
-    //		applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
-    //		std::abort();
-    //	}
-    //}
-    template<typename ...Args> void AppLogTrace(Args &&...args)		{}
+    template<typename T, typename ...Args> void AppAssert(T object, Args &&...args) {}
+
     template<typename ...Args> void AppLogDebug(Args &&...args)		{}
-    //#define AppAssert(...);
-    //#define AppLogDebug(...);
-    //#define AppLogTrace(...);
+    template<typename ...Args> void AppLogTrace(Args &&...args)		{}
 #elif APP_MODE_DISTRIBUTION
+    template<typename T, typename ...Args> void AppAssert(T *object, Args &&...args) {}
+    template<typename T, typename ...Args> void AppAssert(T object, Args &&...args) {}
+
     template<typename ...Args> void AppLogInfo(Args &&...args)		{}
-    //#define AppLogInfo(...);
+    template<typename ...Args> void AppLogDebug(Args &&...args)		{}
+    template<typename ...Args> void AppLogTrace(Args &&...args)		{}
 #endif
 
 }
