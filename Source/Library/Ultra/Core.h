@@ -5,6 +5,9 @@
 
 import Ultra.Log;
 
+#define APP_MODE_DEBUG 1
+#define APP_DEBUG_MODE 1
+
 ///
 /// @brief Library Extensions
 ///
@@ -49,7 +52,7 @@ import Ultra.Log;
 #ifdef APP_MODE_DEBUG
     #define AppAssert(x, ...) if(AppAssert(x, __VA_ARGS__)) APP_DEBUGBREAK() // Workaround, add the debug break after the message.
 
-    #define APP_ASSERT(x, ...) { if(!(x)) { AppLogCritical("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
+    #define APP_ASSERT(x, ...) { if(!(x)) { AppLogFatal("[", __FUNCTION__, "]: ", __VA_ARGS__); APP_DEBUGBREAK(); } }
 #elif APP_MODE_RELEASE
     #ifdef LIB_SETTING_REPLACE_LOGGER
         #define AppAssert(...);

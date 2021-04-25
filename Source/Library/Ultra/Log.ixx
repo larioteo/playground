@@ -8,6 +8,7 @@
 #include <sstream>
 #include <string>
 #include <string_view>
+#include <source_location>
 #include <type_traits>
 
 export module Ultra.Log;
@@ -150,6 +151,71 @@ public:
         return (*this);
     }
 
+    // ToDo: Finish Source Location
+    template <typename_logmodifier T>
+    Log &Write(T &&data, const std::source_location &location = std::source_location::current()) {
+        std::unique_lock<mutex> lock(mSync);
+
+        if constexpr (std::is_same_v<T, LogLevel>) {
+            if (data >= mLogLevel) {
+                mSkip = false;
+                auto timestamp = apptime.GetTimeStamp("%Y-%m-%dT%H:%M");
+                switch (data) {
+                    case LogLevel::Fatal: {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Fatal ] ";
+                        break;
+                    }
+                    case LogLevel::Error:       {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Error ] ";
+                        break;
+                    }
+                    case LogLevel::Warn: {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Warn  ] ";
+                        break; }
+                    case LogLevel::Info: {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray	    << "[ Info  ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Info  ] ";
+                        break; }
+                    case LogLevel::Debug: {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Debug ] ";
+                        break; }
+                    case LogLevel::Trace: {
+                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
+                        mFileStream                 << timestamp << " | "                               << "[ Trace ] ";
+                        break; }
+
+                    case LogLevel::Caption:     {
+                        mCaptionActive = true;
+                        mStream << Cli::Color::LightBlue    << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        mFileStream                         << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
+                        break;
+                    }
+                    case LogLevel::Delimiter: {
+                        mStream << Cli::Color::Yellow       << "----------------------------------------------------------------\n";
+                        mFileStream                         << "----------------------------------------------------------------\n";
+                        break;
+                    }
+
+                    default: {
+                        mStream << Cli::Color::White;
+                        break;
+                    }
+                }
+            } else {
+                mSkip = true;
+            }
+        }
+
+        mStream << location.function_name();
+
+        return (*this);
+    }
+    // ~ToDo
+
     template <typename T>
     Log &operator<<(T &&data) {
         std::unique_lock<mutex> lock(mSync);
@@ -214,20 +280,28 @@ public:
             << Cli::Color::LightBlue    << "test"
             << Cli::Color::Default      << "!\n";
 
+        // Types
+        Log::Instance() << "Integers[i|l|ll|u|ul|ull]: " << 0 << 0l << 0ll << 0u << 0ul << 0ull << "\n";
+
+
 
         char Char[] = "Char *\n";
         const char *ConstChar = "ConstChar *\n";
+        std::string String = "String\n";
+
+        Log::Instance() << Cli::Color::LightRed << Char;
+        Log::Instance() << Cli::Color::LightGreen << ConstChar;
+        Log::Instance() << Cli::Color::LightBlue << String;
+        Log::Instance() << "--\n";
+
         //wchar_t WChar_T[] = L"WChar_T *\n";
         //const wchar_t *ConstWChar_T = L"ConstWChar_T *\n";
-        std::string String = "String\n";
         //std::wstring WString = L"WString\n";
-
-        Log::Instance() << Cli::Color::LightBlue << Char;
-        Log::Instance() << Cli::Color::LightBlue << ConstChar;
+        // 
         //Log::Instance() << Cli::Color::LightBlue << WChar_T;
         //Log::Instance() << Cli::Color::LightBlue << ConstWChar_T;
-        Log::Instance() << Cli::Color::LightBlue << String;
         //Log::Instance() << Cli::Color::LightBlue << WString;
+
         Log::Instance() << Cli::Color::LightBlue << std::endl;
     }
 
@@ -282,14 +356,14 @@ template<typename ...Args> void AppLogDebug(Args &&...args)		{ applog << LogLeve
 template<typename ...Args> void AppLogInfo(Args &&...args)		{ applog << LogLevel::Info	    ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogWarning(Args &&...args)   { applog << LogLevel::Warn	    ; (applog << ... << args); applog << "\n"; }
 template<typename ...Args> void AppLogError(Args &&...args)		{ applog << LogLevel::Error	    ; (applog << ... << args); applog << "\n"; }
-template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogLevel::Fatal     ; (applog << ... << args); applog << "\n"; throw std::runtime_error(""); }
+template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogLevel::Fatal     ; (applog << ... << args); applog << "\n"; }
 
 // ToDo: Should the application get killed if something goes "very" wrong, or stay up?
 #if APP_MODE_DEBUG
     template<typename T, typename ...Args> bool AppAssert(T *object, Args &&...args) {
         if (!object) {
             applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
-            //std::abort();
+            //std::abort(); || throw std::runtime_error("");
             return true;
         }
         return false;
@@ -297,7 +371,7 @@ template<typename ...Args> void AppLogFatal(Args &&...args)	    { applog << LogL
     template<typename T, typename ...Args> bool AppAssert(T object, Args &&...args) {
         if (!object) {
             applog << LogLevel::Fatal; (applog << ... << args); applog << "\n";
-            //std::abort();
+            //std::abort(); || throw std::runtime_error("");
             return true;
         }
         return false;

@@ -28,12 +28,23 @@ export import Ultra.Utility.UUID;
 export namespace Ultra {
 
 void ShowLibraryInfo() {
-    applog << "Library Information\n"
-        << " - Caption:     " << Library::LibCaption << "\n"
-        << " - Description: " << Library::LibDescription << "\n"
-        << " - Release:     " << Library::LibRelease << "\n"
-        << " - Version:     " << Library::LibVersion << "\n"
-        << "\n";
+    logger << "Library Information\n"
+        << " - Caption:     " << LibCaption     << "\n"
+        << " - Description: " << LibDescription << "\n"
+        << " - Release:     " << LibRelease     << "\n"
+        << " - Version:     " << LibVersion     << "\n";
+
+    logger << "Library Features\n" << std::boolalpha
+        << " - Prime:   " << Features::LibPrimeExtensions   << "\n"
+        << " - Core:    " << Features::LibCoreExtensions    << "\n"
+        << " - Debug:   " << Features::LibDebugExtensions   << "\n"
+        << " - GFX:     " << Features::LibGfxExtensions     << "\n"
+        << " - System:  " << Features::LibSystemExtensions  << "\n"
+        << " - UI:      " << Features::LibUiExtensions      << "\n"
+        << " - Utility: " << Features::LibUtilityExtensions << "\n"
+        << std::noboolalpha;
+
+    logger << "\n";
 }
 
 }

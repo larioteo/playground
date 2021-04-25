@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Ultra/Core.h>
+
 ///
 /// Properties
 ///

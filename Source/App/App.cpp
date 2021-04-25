@@ -11,28 +11,21 @@ namespace Ultra {
 
 class App: public Application {
 public:
-    App(const ApplicationProperties &properties): Application(properties) {
-    }
-
-    void Create() override {
-        Test();
-    }
-    
-    void Destroy() override {
-    }
-    
-    void Update(Timestamp deltaTime) override {
-    }
+    App(const ApplicationProperties &properties): Application(properties) {}
+    void Create() override { Test(); }
+    void Destroy() override {}
+    void Update(Timestamp deltaTime) override {}
 
     // Tests
     void Test() {
         // Preparation
         applog << "\n";
+        applog.Write(LogLevel::Info);
 
         // Single-Threaded
         auto durationST = TestST();
+        applog << "MainThread [" << std::this_thread::get_id() << "]: ID" << std::endl;
         applog << "Single-Threaded[" << applog.GetCounter() << "]: " << durationST << "ms\n";
-        AppAssert(false, "Assert");
 
         // Multi-Threaded
         auto future1 = std::async(std::launch::async, TestMT);
@@ -58,10 +51,8 @@ public:
         ShowLibraryInfo();
 
         // Log
-        applog << LogLevel::Default << Cli::Color::White << "Hello " << Cli::Color::Blue << "Wo" << Cli::Color::Red << "rl" << Cli::Color::Yellow << "d!" << std::endl;
-        AppLogInfo("Info");
-        applog << Cli::Color::Red << "Haha\n";
-        //applog.SetLevel(LogLevel::Default);
+        AppAssert(true, "Assert");
+        Log::Test();
 
         /// System
         // Cli
@@ -74,7 +65,6 @@ public:
         applog << apptime.GetIsoTime() << std::endl;
 
         // Enum
-        Log::Test();
         applog << "EventCategory::System: " << GetEnumType(Utility::EventCategory::System) << "\n";
 
         // EventData
@@ -86,19 +76,20 @@ public:
         UUID uuid;
         applog << uuid << std::endl;
 
+        applog << "MainThread [" << std::this_thread::get_id() << "]: Done ST" << std::endl;
         return timer.GetDeltaTime();
     }
 
     static double TestMT() {
         auto timer = Timer();
 
-        const auto Iterations = 20000;
+        const auto Iterations = 10000;
 
         // Default
         for (int i = 0; i <= Iterations; i++) {
             applog << LogLevel::Default << "" << Cli::Style::Reset;
         }
-        applog << std::endl;
+        applog << "Thread [" << std::this_thread::get_id() << "]: Finished" << std::endl;
 
         return timer.GetDeltaTime();
     }

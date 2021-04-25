@@ -1,8 +1,8 @@
 ﻿module;
 
+#include <fstream>
 #include <iomanip>
 #include <iostream>
-#include <fstream>
 #include <ostream>
 
 export module Ultra.System.Cli;
@@ -89,17 +89,17 @@ enum class Style {
 };
 
 template <typename T>
-concept typename_Climodifier =
+concept typename_climodifier =
     std::is_same_v<T, Ultra::Cli::Background> ||
     std::is_same_v<T, Ultra::Cli::Color> ||
     std::is_same_v<T, Ultra::Cli::Style>;
 
-template <typename_Climodifier T>
+template <typename_climodifier T>
 std::ostream &operator<<(std::ostream &stream, T type) {
     return stream << "\x1b[" << static_cast<int>(type) << "m";
 }
 
-template <typename_Climodifier T>
+template <typename_climodifier T>
 std::ofstream &operator<<(std::ofstream &stream, T type) {
     return stream;
 }

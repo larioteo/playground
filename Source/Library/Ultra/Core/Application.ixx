@@ -82,9 +82,6 @@ public:
         pAppInstance = this;
         mProperties = properties;
 
-        logger << "Hallo Haubi";
-        AppLog("Hallo", "Hallo", "Hallo");
-
         // Initialization
         applog << LogLevel::Caption << "Initialization" << "\n";
 
