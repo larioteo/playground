@@ -1,8 +1,10 @@
 ﻿module;
 
-#include "Core.h"
+//#include "Core.h"
 
 export module Ultra.EntryPoint;
+
+//export import "Core.h";
 
 ///
 /// @brief Application EntryPoint

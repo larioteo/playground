@@ -1,10 +1,14 @@
 ﻿#include <Settings.h>
 
+#include <format>
 #include <future>
 
 #include <Ultra/EntryPoint.h>
 
 import Ultra;
+
+import Ultra.Debug.Memory;
+import Ultra.Debug.Profiler;
 
 // Application
 namespace Ultra {
@@ -18,9 +22,10 @@ public:
 
     // Tests
     void Test() {
+        APP_PROFILE_BEGIN_SESSION("Playground", "results.json");
         // Preparation
         applog << "\n";
-        applog.Write(LogLevel::Info);
+        applog.Location("Test");
 
         // Single-Threaded
         auto durationST = TestST();
@@ -34,9 +39,16 @@ public:
         auto future4 = std::async(std::launch::async, TestMT);
         auto durationMT = future1.get() + future2.get() + future3.get() + future4.get();
         applog << "Multi-Threaded[" << applog.GetCounter() << "]: " << durationMT << "ms\n";
+        VerifyMemoryUsage();
+        string *newstring = new string();
+        VerifyMemoryUsage();
+        delete newstring;
+        VerifyMemoryUsage();
+        APP_PROFILE_END_SESSION(); 
     }
 
     static double TestST() {
+        APP_PROFILE_FUNCTION();
         /// Preparation
         auto timer = Timer();
 
@@ -81,6 +93,7 @@ public:
     }
 
     static double TestMT() {
+        APP_PROFILE_FUNCTION();
         auto timer = Timer();
 
         const auto Iterations = 10000;

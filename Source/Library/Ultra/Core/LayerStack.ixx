@@ -2,9 +2,9 @@
 
 #include "../Core.h"
 
-export module Ultra.LayerStack;
+export module Ultra.Core.LayerStack;
 
-import Ultra.Layer;
+import Ultra.Core.Layer;
 
 export namespace Ultra {
 

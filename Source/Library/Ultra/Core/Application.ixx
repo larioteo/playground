@@ -1,23 +1,23 @@
 ﻿module;
 
-#include "../Core.h"
-//#include "Omnia/Config.h"
-//#include "Omnia/GFX/Context.h"
-//#include "Omnia/UI/Dialog.h"
-//#include "Omnia/UI/Event.h"
-//#include "Omnia/UI/GuiLayer.h"
-//#include "Omnia/UI/Window.h"
-
 #include <queue>
 #include <future>
 #include <functional>
 
+#include "Ultra/Core.h"
 
 export module Ultra.Application;
 
-import Ultra.Layer;
-import Ultra.LayerStack;
+import Ultra.Config;
 import Ultra.Log;
+
+import Ultra.Core.Layer;
+import Ultra.Core.LayerStack;
+import Ultra.GFX.Surface;
+import Ultra.UI.Event;
+import Ultra.UI.Layer;
+import Ultra.UI.Popup;
+import Ultra.UI.Window;
 import Ultra.Utility.DateTime;
 import Ultra.Utility.Timer;
 
@@ -218,4 +218,3 @@ private:
 Application *Application::pAppInstance = nullptr;
 
 }
-

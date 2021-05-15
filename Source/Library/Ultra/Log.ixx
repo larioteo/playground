@@ -89,7 +89,7 @@ public:
         LogFile = object;
     }
 
-    // Methos
+    // Methods
     template <typename_logmodifier T>
     Log &operator<<(T &&data) {
         std::unique_lock<mutex> lock(mSync);
@@ -97,7 +97,7 @@ public:
         if constexpr (std::is_same_v<T, LogLevel>) {
             if (data >= mLogLevel) {
                 mSkip = false;
-                auto timestamp = apptime.GetTimeStamp("%Y-%m-%dT%H:%M");
+                auto timestamp = apptime.GetTimeStamp();
                 switch (data) {
                     case LogLevel::Fatal: {
                         mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
@@ -150,71 +150,6 @@ public:
 
         return (*this);
     }
-
-    // ToDo: Finish Source Location
-    template <typename_logmodifier T>
-    Log &Write(T &&data, const std::source_location &location = std::source_location::current()) {
-        std::unique_lock<mutex> lock(mSync);
-
-        if constexpr (std::is_same_v<T, LogLevel>) {
-            if (data >= mLogLevel) {
-                mSkip = false;
-                auto timestamp = apptime.GetTimeStamp("%Y-%m-%dT%H:%M");
-                switch (data) {
-                    case LogLevel::Fatal: {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::Red            << "[ Fatal ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Fatal ] ";
-                        break;
-                    }
-                    case LogLevel::Error:       {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightRed       << "[ Error ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Error ] ";
-                        break;
-                    }
-                    case LogLevel::Warn: {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightYellow    << "[ Warn  ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Warn  ] ";
-                        break; }
-                    case LogLevel::Info: {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGray	    << "[ Info  ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Info  ] ";
-                        break; }
-                    case LogLevel::Debug: {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightGreen     << "[ Debug ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Debug ] ";
-                        break; }
-                    case LogLevel::Trace: {
-                        mStream << Cli::Color::Gray << timestamp << " | " << Cli::Color::LightMagenta   << "[ Trace ] ";
-                        mFileStream                 << timestamp << " | "                               << "[ Trace ] ";
-                        break; }
-
-                    case LogLevel::Caption:     {
-                        mCaptionActive = true;
-                        mStream << Cli::Color::LightBlue    << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
-                        mFileStream                         << "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬\n";
-                        break;
-                    }
-                    case LogLevel::Delimiter: {
-                        mStream << Cli::Color::Yellow       << "----------------------------------------------------------------\n";
-                        mFileStream                         << "----------------------------------------------------------------\n";
-                        break;
-                    }
-
-                    default: {
-                        mStream << Cli::Color::White;
-                        break;
-                    }
-                }
-            } else {
-                mSkip = true;
-            }
-        }
-
-        mStream << location.function_name();
-
-        return (*this);
-    }
-    // ~ToDo
 
     template <typename T>
     Log &operator<<(T &&data) {
@@ -258,7 +193,17 @@ public:
         return (*this);
     }
 
-    // Methods
+    // ToDo: Finish Source Location
+    template <typename T>
+    Log &Location(T &&data, const std::source_location &location = std::source_location::current()) {
+        std::unique_lock<mutex> lock(mSync);
+
+        mStream << " | " << location.function_name() << " | " << std::forward<T>(data);
+
+        return (*this);
+    }
+    // ~ToDo
+
     static void Test() {
         Log::Instance() << LogLevel::Caption    << "Caption" << "\n";
         Log::Instance() << LogLevel::Default    << "Default" << "\n";

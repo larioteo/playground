@@ -11,7 +11,7 @@ export import Ultra.Log;
 
 // Core Extensions
 export import Ultra.Application;
-export import Ultra.Layer;
+export import Ultra.Core.Layer;
 
 // System Extensions
 export import Ultra.System.Cli;

@@ -3,7 +3,7 @@
 #include "../Core.h"
 //#include "Omnia/UI/Event.h"
 
-export module Ultra.Layer;
+export module Ultra.Core.Layer;
 
 import Ultra.Utility.Timer;
 

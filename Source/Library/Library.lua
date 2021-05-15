@@ -11,6 +11,10 @@
     
     debugdir "%{wks.location}/Build/%{cfg.buildcfg}"
     files { "**.h", "**.cpp", "**.cppm", "**.inl", "**.ixx" }
+    
+	includedirs {
+		"%{Headers.Library}"
+    }
 
     filter { "configurations:Debug" }
         defines { "_DEBUG" }

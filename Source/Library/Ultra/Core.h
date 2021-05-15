@@ -7,6 +7,7 @@ import Ultra.Log;
 
 #define APP_MODE_DEBUG 1
 #define APP_DEBUG_MODE 1
+#define APP_PROFILE 1
 
 ///
 /// @brief Library Extensions
@@ -79,4 +80,66 @@ import Ultra.Log;
     #define APP_LOG_INFO(...);
     #define APP_LOG_DEBUG(...);
     #define APP_LOG_TRACE(...);
+#endif
+
+///
+/// @brief Profiler Extensions
+///
+
+#if APP_PROFILE
+    #if defined(_MSC_VER) 
+        #define APP_FUNCTION_SIGNATURE  __func__
+    #endif
+    #define APP_PROFILE_BEGIN_SESSION(name, filepath)	::Ultra::Profiler::Instrumentor::Get().BeginSession(name, filepath)
+    #define APP_PROFILE_END_SESSION()					::Ultra::Profiler::Instrumentor::Get().EndSession()
+    #define APP_PROFILE_SCOPE(name)						constexpr auto fixedName = ::Ultra::Profiler::Utilities::CleanupOutputString(name, "__cdecl "); \
+													    ::Ultra::Profiler::Timer timer##__LINE__(fixedName.Data)
+    #define APP_PROFILE_FUNCTION()						APP_PROFILE_SCOPE(APP_FUNCTION_SIGNATURE)
+
+    #define APP_PROFILE_SCOPET(name)                    ScopedTimer timer##__LINE__(name, [&](ProfileResult result) { ProfileResults.push_back(result); })
+#else
+    #define APP_PROFILE_BEGIN_SESSION(name, filepath)
+    #define APP_PROFILE_END_SESSION()
+    #define APP_PROFILE_SCOPE(name)
+    #define APP_PROFILE_FUNCTION()
+
+    #define APP_PROFILE_SCOPET(name)
+#endif
+
+
+///
+/// @brief Cleanup
+///
+
+#ifdef FROM_PCH
+    #include <algorithm>
+    #include <cstdint>
+    #include <chrono>
+    #include <filesystem>
+    #include <functional>
+    #include <memory>
+    #include <mutex>
+    #include <random>
+    #include <type_traits>
+    #include <utility>
+
+    #include <future>
+    #include <thread>
+
+    #include <iostream>
+    #include <iomanip>
+    #include <fstream>
+    #include <ostream>
+    #include <sstream>
+
+    #include <any>
+    #include <array>
+    #include <map>
+    #include <optional>
+    #include <queue>
+    #include <string>
+    #include <string_view>
+    #include <unordered_map>
+    #include <unordered_set>
+    #include <vector>
 #endif
