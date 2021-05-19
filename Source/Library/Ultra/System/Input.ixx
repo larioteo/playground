@@ -2,9 +2,9 @@
 
 #include <tuple>
 
-#include "../Core.h"
+#include "Ultra/Core.h"
 
-export module Ultra.Input;
+export module Ultra.System.Input;
 
 //struct KeyCode;
 //struct MouseButton;

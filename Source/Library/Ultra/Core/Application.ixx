@@ -89,8 +89,9 @@ public:
         //mConfig = CreateReference<Config>();
 
         // Load Window, Context and Events
-        //mWindow = Window::Create(WindowProperties(properties.Title, properties.Width, properties.Height));
-        //pListener = EventListener::Create();
+        // ToDo: Cannot be called outside this library, which doesn't make sense yet at all...
+        mWindow = Window::Create(WindowProperties(properties.Title, properties.Width, properties.Height));
+        mListener = EventListener::Create();
         AppLogDebug("[Application] ", "Created window '", properties.Title, "' with size '", properties.Width, "x", properties.Height, "'");
 
         // Load Core Layer
@@ -116,8 +117,7 @@ public:
         double delay = {};
         double frames = {};
         string statistics;
-        string title = {};
-        //string title = mWindow->GetTitle();
+        string title = mWindow->GetTitle();
 
         // Subscribe to all events (internal)
         //auto oDispatcher = mWindow->EventCallback.Subscribe([&](bool &result, void *event) { pListener->Callback(result, event); });
@@ -129,7 +129,7 @@ public:
 
         while (Running) {
             // Update events and check if application is paused
-            //pListener->Update();
+            mListener->Update();
             if (Paused) continue;
             if (Reloaded) {
                 Reloaded = false;
@@ -147,7 +147,7 @@ public:
                 float msPF = 1000.0f / (float)frames;
 
                 statistics = title + " [FPS:" + std::to_string(frames) + " | msPF:" + std::to_string(msPF) + "]";
-                //mWindow->SetTitle(statistics);
+                mWindow->SetTitle(statistics);
 
                 frames = 0;
                 delay = 0.0f;
@@ -205,6 +205,10 @@ private:
     // Properties
     ApplicationProperties mProperties;
     Statistics statistics;
+
+    // Objects
+    Scope<Window> mWindow;
+    Scope<EventListener> mListener;
 
     // States
     bool Paused;

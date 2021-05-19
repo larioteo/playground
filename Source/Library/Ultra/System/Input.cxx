@@ -1,7 +1,11 @@
-﻿module Ultra.Input;
+﻿module;
+
+#include "Ultra/Core.h"
+
+module Ultra.System.Input;
 
 #if defined(APP_PLATFORM_WINDOWS)
-    #include "Platform/System/WinAPI/WinInput.h"
+    import Platform.System.Input;
 #endif
 
 //namespace Ultra {

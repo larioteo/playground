@@ -96,7 +96,7 @@ public:
         APP_PROFILE_FUNCTION();
         auto timer = Timer();
 
-        const auto Iterations = 10000;
+        const auto Iterations = 1000;
 
         // Default
         for (int i = 0; i <= Iterations; i++) {
@@ -112,5 +112,5 @@ public:
 
 // Application Entry-Point
 Ultra::Application *CreateApplication() {
-    return new Ultra::App({ "Playground", "1280x1024" });
+    return new Ultra::App({ "Playground", "1024x768" });
 }

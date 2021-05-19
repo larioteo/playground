@@ -2,7 +2,7 @@
     defines { "PROJECT_NAME=Library" }
     kind "StaticLib"
     language "C++"
-    characterset "Unicode"
+    characterset "MBCS"
     confromancemode "true"
     cdialectx "C17"
     cppdialect "C++Latest"
@@ -10,7 +10,7 @@
     toolset "msc"
     
     debugdir "%{wks.location}/Build/%{cfg.buildcfg}"
-    files { "**.h", "**.cpp", "**.cppm", "**.inl", "**.ixx" }
+    files { "**.h", "**.cpp", "**.cppm", "**.cxx", "**.inl", "**.ixx" }
     
 	includedirs {
 		"%{Headers.Library}"

@@ -16,6 +16,10 @@ export import Ultra.Core.Layer;
 // System Extensions
 export import Ultra.System.Cli;
 
+// UI Extensions
+export import Ultra.UI.Event;
+export import Ultra.UI.Window;
+
 // Utility Extensions
 export import Ultra.Utility.DateTime;
 export import Ultra.Utility.Enum;

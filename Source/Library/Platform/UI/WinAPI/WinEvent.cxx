@@ -1,26 +1,23 @@
-﻿#include "WinEvent.h"
-#include "WinWindow.h"
+﻿module;
 
-
-#ifdef APP_DISABLED_CODE
-
+#undef APIENTRY
+#define NOMINMAX
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#undef APIENTRY
 #include <Windows.h>
 #include <WindowsX.h>
 
 #ifndef HID_USAGE_PAGE_GENERIC
-	#define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
+    #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
 #endif
 #ifndef HID_USAGE_GENERIC_MOUSE
-	#define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
+    #define HID_USAGE_GENERIC_MOUSE        ((USHORT) 0x02)
 #endif
 
+module Platform.UI.WinAPI.Event;
 
-import Ultra.Event.Data;
-
+import Platform.UI.WinAPI.Window;
+import Ultra.UI.Event.Data;
 
 namespace Ultra {
 
@@ -70,6 +67,7 @@ intptr_t WinEventListener::Register(void *event) {
 	// - Keyboard Input:	https://docs.microsoft.com/en-us/windows/win32/inputdev/keyboard-input-notifications
 	// - Mouse Input:		https://docs.microsoft.com/en-us/windows/win32/inputdev/mouse-input-notifications
 	// Pre-Flight-Test: Check if there are any observers in the goups, so the user gets only what he needs.
+    #ifdef APP_DISABLED_CODE
 	switch (uMsg) {
 		/**
 		 *	Input Events
@@ -574,10 +572,9 @@ intptr_t WinEventListener::Register(void *event) {
 			break;
 		}
 	}
+    #endif
 
 	return result;
 }
 
 }
-
-#endif

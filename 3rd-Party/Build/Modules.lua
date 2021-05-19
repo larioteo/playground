@@ -74,6 +74,7 @@ end)
 
 -- Visual Studio: C++ 20 Modules Support
 table.insert(premake.vstudio.vc2010.categories.ClCompile.extensions, ".cppm")
+table.insert(premake.vstudio.vc2010.categories.ClCompile.extensions, ".cxx")
 table.insert(premake.vstudio.vc2010.categories.ClCompile.extensions, ".ixx")
 
 require('vstudio')

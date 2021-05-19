@@ -28,11 +28,11 @@ enum class EventCategory {
 inline std::ostream &operator<<(std::ostream &stream, Ultra::Utility::EventCategory category) {
     switch (category) {
         case Ultra::Utility::EventCategory::Default:		{ stream << "Default";		break; }
-        case Ultra::Utility::EventCategory::System:		{ stream << "System";	    break; }
+        case Ultra::Utility::EventCategory::System:		    { stream << "System";	    break; }
         case Ultra::Utility::EventCategory::Application:	{ stream << "Application";	break; }
         case Ultra::Utility::EventCategory::Library:		{ stream << "Library";		break; }
         case Ultra::Utility::EventCategory::User:		    { stream << "User";		    break; }
-        default:                                        { stream << "Undefined";    break; }
+        default:                                            { stream << "Undefined";    break; }
     }
     return stream;
 }
@@ -49,10 +49,10 @@ inline std::ostream &operator<<(std::ostream &stream, Ultra::Utility::EventPrior
     switch (priority) {
         case Ultra::Utility::EventPriority::Default:		{ stream << "Default";		break; }
         case Ultra::Utility::EventPriority::Low:			{ stream << "Low";			break; }
-        case Ultra::Utility::EventPriority::Normal:		{ stream << "Normal";		break; }
+        case Ultra::Utility::EventPriority::Normal:		    { stream << "Normal";		break; }
         case Ultra::Utility::EventPriority::High:			{ stream << "High";		    break; }
         case Ultra::Utility::EventPriority::Realtime:		{ stream << "Realtime";	    break; }
-        default:                                        { stream << "Undefined";    break; }
+        default:                                            { stream << "Undefined";    break; }
     }
     return stream;
 }
@@ -84,16 +84,16 @@ enum class EventSource {
 };
 inline std::ostream &operator<<(std::ostream &stream, Ultra::Utility::EventSource source) {
     switch (source) {
-        case Ultra::Utility::EventSource::Default:	{ stream << "Default";		break; }
+        case Ultra::Utility::EventSource::Default:	    { stream << "Default";		break; }
         case Ultra::Utility::EventSource::Device:		{ stream << "Device";		break; }
         case Ultra::Utility::EventSource::Power:		{ stream << "Power";		break; }
         case Ultra::Utility::EventSource::Window:		{ stream << "Window";		break; }
-        case Ultra::Utility::EventSource::Keyboard:	{ stream << "Keyboard";		break; }
+        case Ultra::Utility::EventSource::Keyboard:	    { stream << "Keyboard";		break; }
         case Ultra::Utility::EventSource::Mouse:		{ stream << "Mouse";		break; }
         case Ultra::Utility::EventSource::Touch:		{ stream << "Touch";		break; }
-        case Ultra::Utility::EventSource::Controller: { stream << "Controller";	break; }
-        case Ultra::Utility::EventSource::Context:	{ stream << "Context";		break; }
-        default:                                    { stream << "Undefined";    break; }
+        case Ultra::Utility::EventSource::Controller:   { stream << "Controller";	break; }
+        case Ultra::Utility::EventSource::Context:	    { stream << "Context";		break; }
+        default:                                        { stream << "Undefined";    break; }
     }
     return stream;
 }

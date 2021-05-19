@@ -22,7 +22,7 @@ void Print(auto var) {
 }
 
 void LoadModule() {
-    HINSTANCE hLibrary = LoadLibrary(L"Library.dll");
+    HINSTANCE hLibrary = LoadLibrary("Library.dll");
    
     if (hLibrary) {
         std::cout << "Success" << std::endl;
