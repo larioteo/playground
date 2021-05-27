@@ -11,6 +11,7 @@
 export module Platform.UI.WinAPI.Window;
 
 import Ultra.UI.Window;
+import Ultra.Utility.Delegate;
 
 export namespace Ultra {
 
@@ -47,6 +48,7 @@ public:
     virtual ~WinWindow() override;
 
     // Methods
+    //Subject<bool &, void *> EventCallback;
     virtual void Update() override;
     intptr_t Message(void *event);
 

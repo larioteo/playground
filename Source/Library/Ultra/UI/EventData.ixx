@@ -6,131 +6,312 @@
 
 export module Ultra.UI.Event.Data;
 
+import Ultra.Utility.Enum;
+
 template<typename T, typename = typename std::enable_if_t<std::is_arithmetic_v<T>, T>>
 constexpr inline auto BitMask(T x) { return (1 << x); }
 
 export namespace Ultra {
 
-/**
-* @brief	Event Category
-*/
+///
+/// @brief Event Specifications
+///
+// Category
 enum class EventCategory: uint8_t {
-	Null		= 0x00,
-
+	Default		= 0x00,
 	System		= 0x10,
 	Application	= 0xA0,
 	Library		= 0xB0,
-
+    User        = 0xC0,
 	Undefined	= 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, EventCategory category) {
 	switch (category) {
-		case EventCategory::Null:			{ stream << "Null";			break; }
+		case EventCategory::Default:		{ stream << "Default";		break; }
 		case EventCategory::System:			{ stream << "System";		break; }
 		case EventCategory::Application:	{ stream << "Application";	break; }
 		case EventCategory::Library:		{ stream << "Library";		break; }
+        case EventCategory::User:		    { stream << "User";		    break; }
 		case EventCategory::Undefined:		{ stream << "-";			break; }
 	}
 	return stream;
 }
 
+// Priority
+enum class EventPriority: uint8_t {
+    Realtime    = 0x00,
+    High        = 0x01,
+    Default     = 0x02,
+    Low         = 0x03,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, EventPriority priority) {
+    switch (priority) {
+        case EventPriority::Realtime:		{ stream << "Realtime";	    break; }
+        case EventPriority::High:			{ stream << "High";		    break; }
+        case EventPriority::Default:		{ stream << "Default";		break; }
+        case EventPriority::Low:			{ stream << "Low";			break; }
+        default:                            { stream << "-";            break; }
+    }
+    return stream;
+}
 
-
-/**
-* @brief	Event Source
-*/
+// Source
 enum class EventSource: uint8_t {
-	Null		= 0x00,
+    // Default
+    Default		= 0x00,
 
+    // System
 	Device		= 0x11,
 	Power		= 0x12,
+    State		= 0x13,
 
-	Controller	= 0xA1,
-	Keyboard	= 0xA2,
-	Mouse		= 0xA3,
-	Touch		= 0xA4,
-	Window		= 0xA5,
+    // Application
+    Window		= 0xA1,
+    Context		= 0xA2,
 
-	Context		= 0xB1,
+    // Library
+    Core        = 0xB1,
+    Graphics    = 0xB2,
+    Interface   = 0xB3,
 
+    // User
+    Controller	= 0xC1,
+    Keyboard	= 0xC2,
+    Mouse		= 0xC3,
+    Touch		= 0xC4,
+
+    // ~
 	Undefined	= 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, EventSource source) {
-	switch (source) {
-		case EventSource::Null:			{ stream << "Null";			break; }
-		case EventSource::Device:		{ stream << "Device";		break; }
-		case EventSource::Power:		{ stream << "Power";		break; }
-		case EventSource::Window:		{ stream << "Window";		break; }
-		case EventSource::Keyboard:		{ stream << "Keyboard";		break; }
-		case EventSource::Mouse:		{ stream << "Mouse";		break; }
-		case EventSource::Touch:		{ stream << "Touch";		break; }
-		case EventSource::Controller:	{ stream << "Controller";	break; }
-		case EventSource::Context:		{ stream << "Context";		break; }
-		case EventSource::Undefined:	{ stream << "-";			break; }
-	}
-	return stream;
+    switch (source) {
+        // Default
+        case EventSource::Default:	    { stream << "Default";		break; }
+        
+        // System
+        case EventSource::Device:		{ stream << "Device";		break; }
+        case EventSource::Power:		{ stream << "Power";		break; }
+        case EventSource::State:		{ stream << "State";		break; }
+
+        // Application
+        case EventSource::Window:		{ stream << "Window";		break; }
+        case EventSource::Context:	    { stream << "Context";		break; }
+        
+        // Library
+        case EventSource::Core:	        { stream << "Core";		    break; }
+        case EventSource::Graphics:		{ stream << "Graphics";		break; }
+        case EventSource::Interface:	{ stream << "Interface";	break; }
+        
+        // User
+        case EventSource::Controller:   { stream << "Controller";	break; }
+        case EventSource::Keyboard:	    { stream << "Keyboard";		break; }
+        case EventSource::Mouse:		{ stream << "Mouse";		break; }
+        case EventSource::Touch:		{ stream << "Touch";		break; }
+        
+        // ~
+        default:                        { stream << "-";            break; }
+    }
+    return stream;
+}
+
+// Helpers
+inline bool IsEventCategory(EventSource source, EventCategory category) {
+    if (Utility::GetEnumType(source) & 1 << Utility::GetEnumType(category)) { return true; }
+    return false;
 }
 
 
 
-/**
-* @brief	Actions
-*/
-enum class DeviceAction {
+///
+/// @brief Actions
+///
+// System
+enum class DeviceAction: uint8_t {
 	Null		= 0x00,
+    Default     = 0x01,
 	Undefined   = 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, DeviceAction action) {
 	switch (action) {
-		case DeviceAction::Null:		{ stream << "Null";			break; }
+		case DeviceAction::Null:		{ stream << "Null";	    	break; }
+        case DeviceAction::Default:	    { stream << "Default";	    break; }
 		case DeviceAction::Undefined:	{ stream << "-";			break; }
 	}
 	return stream;
 }
 
-enum class PowerAction {
-	Null		= 0x00,
+enum class PowerAction: uint8_t {
+    Null		= 0x00,
+    Default     = 0x01,
 	Undefined   = 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, PowerAction action) {
 	switch (action) {
-		case PowerAction::Null:			{ stream << "Null";			break; }
+		case PowerAction::Null:		    { stream << "Null";	    	break; }
+        case PowerAction::Default:	    { stream << "Default";	    break; }
 		case PowerAction::Undefined:	{ stream << "-";			break; }
 	}
 	return stream;
 }
 
+enum class StateAction: uint8_t {
+    Null		= 0x00,
+    Default     = 0x01,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, StateAction action) {
+    switch (action) {
+        case StateAction::Null:		    { stream << "Null";	    	break; }
+        case StateAction::Default:	    { stream << "Default";	    break; }
+        case StateAction::Undefined:	{ stream << "-";			break; }
+    }
+    return stream;
+}
 
+// Application
+enum class WindowAction: uint8_t {
+    Null		= 0x00,
+
+    Create		= 0x01,
+    Destroy		= 0x02,
+
+    Activate	= 0x10,
+    Focus		= 0x11,
+    Maximize	= 0x12,
+    Minimize	= 0x13,
+    Show		= 0x14,
+
+    Draw		= 0x20,
+    DpiUpdate	= 0x21,
+    Move		= 0x22,
+    Resize		= 0x23,
+    Restore		= 0x24,
+
+    DragNDrop	= 0x31,
+
+    Undefined	= 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, WindowAction action) {
+    switch (action) {
+        case WindowAction::Null:		{ stream << "Null";	    	break; }
+
+        case WindowAction::Create:		{ stream << "Create";		break; }
+        case WindowAction::Destroy:		{ stream << "Destroy";		break; }
+
+        case WindowAction::Activate:	{ stream << "Activate";		break; }
+        case WindowAction::Focus:		{ stream << "Focus";		break; }
+        case WindowAction::Maximize:	{ stream << "Maximize";		break; }
+        case WindowAction::Minimize:	{ stream << "Minimize";		break; }
+        case WindowAction::Show:		{ stream << "Show";			break; }
+
+        case WindowAction::Draw:		{ stream << "Draw";			break; }
+        case WindowAction::DpiUpdate:	{ stream << "DpiUpdate";	break; }
+        case WindowAction::Move:		{ stream << "Move";			break; }
+        case WindowAction::Resize:		{ stream << "Resize";		break; }
+        case WindowAction::Restore:		{ stream << "Restore";		break; }
+
+        case WindowAction::DragNDrop:	{ stream << "DragNDrop";	break; }
+
+        case WindowAction::Undefined:	{ stream << "-";			break; }
+    }
+    return stream;
+}
+
+enum class ContextAction: uint8_t {
+    Null		= 0x00,
+    Buffer		= 0x01,
+    Draw		= 0x02,
+    Reload		= 0x03,
+    Resize		= 0x04,
+    Switch		= 0x05,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, ContextAction action) {
+    switch (action) {
+        case ContextAction::Null:	    { stream << "Null";		    break; }
+        case ContextAction::Buffer:		{ stream << "Buffer";		break; }
+        case ContextAction::Draw:		{ stream << "Draw";		    break; }
+        case ContextAction::Reload:		{ stream << "Reload";		break; }
+        case ContextAction::Resize:		{ stream << "Resize";		break; }
+        case ContextAction::Switch:		{ stream << "Switch";		break; }
+        case ContextAction::Undefined:	{ stream << "-";			break; }
+    }
+    return stream;
+}
+
+// Library
+enum class CoreAction: uint8_t {
+    Null		= 0x00,
+    Default     = 0x01,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, CoreAction action) {
+    switch (action) {
+        case CoreAction::Null:		        { stream << "Null";	    	break; }
+        case CoreAction::Default:	        { stream << "Default";	    break; }
+        case CoreAction::Undefined:	        { stream << "-";			break; }
+    }
+    return stream;
+}
+
+enum class GraphicsAction: uint8_t {
+    Null		= 0x00,
+    Default     = 0x01,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, GraphicsAction action) {
+    switch (action) {
+        case GraphicsAction::Null:		    { stream << "Null";	    	break; }
+        case GraphicsAction::Default:	    { stream << "Default";	    break; }
+        case GraphicsAction::Undefined:	    { stream << "-";			break; }
+    }
+    return stream;
+}
+
+enum class InterfaceAction: uint8_t {
+    Null		= 0x00,
+    Default     = 0x01,
+    Undefined   = 0xFF,
+};
+inline std::ostream &operator<<(std::ostream &stream, InterfaceAction action) {
+    switch (action) {
+        case InterfaceAction::Null:		    { stream << "Null";	    	break; }
+        case InterfaceAction::Default:	    { stream << "Default";	    break; }
+        case InterfaceAction::Undefined:    { stream << "-";			break; }
+    }
+    return stream;
+}
+
+// User
 enum class ControllerAction: uint8_t {
-	Null		= 0x00,
-	Analog		= 0x10,
-	Digital		= 0x20,
-	Button		= 0x30,
-	Undefined   = 0xFF,
+    Null		= 0x00,
+    Analog		= 0x10,
+    Digital		= 0x20,
+    Button		= 0x30,
+    Undefined   = 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, ControllerAction action) {
-	switch (action) {
-		case ControllerAction::Null:		{ stream << "Null";			break; }
-		case ControllerAction::Analog:		{ stream << "Start";		break; }
-		case ControllerAction::Digital:		{ stream << "Cancel";		break; }
-		case ControllerAction::Button:		{ stream << "End";			break; }
-		case ControllerAction::Undefined:	{ stream << "-";			break; }
-	}
-	return stream;
+    switch (action) {
+        case ControllerAction::Null:	    { stream << "Null";	    break; }
+        case ControllerAction::Analog:		{ stream << "Analog";	break; }
+        case ControllerAction::Digital:		{ stream << "Digital";	break; }
+        case ControllerAction::Button:		{ stream << "Button";	break; }
+        case ControllerAction::Undefined:	{ stream << "-";		break; }
+    }
+    return stream;
 }
 
 enum class KeyboardAction: uint8_t {
-	Null		= 0x00,
+    Null		= 0x00,
 	Raw			= 0x01,
-	Default		= 0x10,
 	Input		= 0x20,
 	Undefined   = 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, KeyboardAction action) {
 	switch (action) {
-		case KeyboardAction::Null:		{ stream << "Null";			break; }
+        case KeyboardAction::Null:	    { stream << "Null";		break; }
 		case KeyboardAction::Raw:		{ stream << "Raw";			break; }
-		case KeyboardAction::Default:	{ stream << "Default";		break; }
 		case KeyboardAction::Input:		{ stream << "Input";		break; }
 		case KeyboardAction::Undefined:	{ stream << "-";			break; }
 	}
@@ -138,7 +319,7 @@ inline std::ostream &operator<<(std::ostream &stream, KeyboardAction action) {
 }
 
 enum class MouseAction: uint8_t {
-	Null		= 0x00,
+    Null		= 0x00,
 	Raw			= 0x01,
 	Click		= 0x10,
 	DoubleClick = 0x11,
@@ -148,7 +329,7 @@ enum class MouseAction: uint8_t {
 };
 inline std::ostream &operator<<(std::ostream &stream, MouseAction action) {
 	switch (action) {
-		case MouseAction::Null:			{ stream << "Null";			break; }
+		case MouseAction::Null:		    { stream << "Null";	    	break; }
 		case MouseAction::Raw:			{ stream << "Raw";			break; }
 		case MouseAction::Click:		{ stream << "Click";		break; }
 		case MouseAction::DoubleClick:	{ stream << "DoubleClick";	break; }
@@ -160,16 +341,16 @@ inline std::ostream &operator<<(std::ostream &stream, MouseAction action) {
 }
 
 enum class TouchAction: uint8_t {
-	Null		= 0x00,
+    Null		= 0x00,
 	Start		= 0x01,
 	Cancel		= 0x02,
 	End			= 0x03,
-	Move		= 0x10,
+	Move		= 0x30,
 	Undefined   = 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, TouchAction action) {
 	switch (action) {
-		case TouchAction::Null:			{ stream << "Null";			break; }
+		case TouchAction::Null:		    { stream << "Null";		    break; }
 		case TouchAction::Start:		{ stream << "Start";		break; }
 		case TouchAction::Cancel:		{ stream << "Cancel";		break; }
 		case TouchAction::End:			{ stream << "End";			break; }
@@ -179,128 +360,77 @@ inline std::ostream &operator<<(std::ostream &stream, TouchAction action) {
 	return stream;
 }
 
-enum class WindowAction: uint8_t {
-	Null		= 0x00,
-
-	Create		= 0x01,
-	Destroy		= 0x02,
-
-	Activate	= 0x10,
-	Focus		= 0x11,
-	Maximize	= 0x12,
-	Minimize	= 0x13,
-	Show		= 0x14,
-
-	Draw		= 0x20,
-	DpiUpdate	= 0x21,
-	Move		= 0x22,
-	Resize		= 0x23,
-	Restore		= 0x24,
-	
-	DragNDrop	= 0x31,
-
-	Undefined	= 0xFF,
-};
-inline std::ostream &operator<<(std::ostream &stream, WindowAction action) {
-	switch (action) {
-		case WindowAction::Null:		{ stream << "Null";			break; }
-		case WindowAction::Create:		{ stream << "Create";		break; }
-		case WindowAction::Destroy:		{ stream << "Destroy";		break; }
-		case WindowAction::Activate:	{ stream << "Activate";		break; }
-		case WindowAction::Focus:		{ stream << "Focus";		break; }
-		case WindowAction::Maximize:	{ stream << "Maximize";		break; }
-		case WindowAction::Minimize:	{ stream << "Minimize";		break; }
-		case WindowAction::Show:		{ stream << "Show";			break; }
-		case WindowAction::Draw:		{ stream << "Draw";			break; }
-		case WindowAction::DpiUpdate:	{ stream << "DpiUpdate";	break; }
-		case WindowAction::Move:		{ stream << "Move";			break; }
-		case WindowAction::Resize:		{ stream << "Resize";		break; }
-		case WindowAction::Restore:		{ stream << "Restore";		break; }
-		case WindowAction::DragNDrop:	{ stream << "DragNDrop";	break; }
-		case WindowAction::Undefined:	{ stream << "-";			break; }
-	}
-	return stream;
-}
 
 
-enum class ContextAction: uint8_t {
-	Null		= 0x00,
-	Render		= 0x01,
-	Draw		= 0x02,
-	Undefined   = 0xFF,
-};
-inline std::ostream &operator<<(std::ostream &stream, ContextAction action) {
-	switch (action) {
-		case ContextAction::Null:		{ stream << "Null";			break; }
-		case ContextAction::Render:		{ stream << "Render";		break; }
-		case ContextAction::Draw:		{ stream << "Click";		break; }
-		case ContextAction::Undefined:	{ stream << "-";			break; }
-	}
-	return stream;
-}
-
-
-
-/**
-* @brief	Buttons, KeyCodes and Styles
-*/
-
+///
+/// @brief Buttons, KeyCodes and Styles
+///
 enum class ControllerButton: uint8_t {
-	Null				= 0x00,
+    // Null
+    Null				= 0x00,
 
-	Start				= 0x01,
+    // Analog Sticks
+    AStickLeftPress		= 0x10,
+    AStickLeftX			= 0x11,
+    AStickLeftY			= 0x12,
+    AStickRightPress	= 0x13,
+    AStickRightX		= 0x14,
+    AStickRightY		= 0x15,
 
-	DPadLeft			= 0x11,
-	DPadUp				= 0x12,
-	DPadRight			= 0x13,
-	DPadDown			= 0x14,
+    // Digital Pad
+	DPadLeft			= 0x21,
+	DPadUp				= 0x22,
+	DPadRight			= 0x23,
+	DPadDown			= 0x24,
 
-	AStickLeftPress		= 0x20,
-	AStickLeftX			= 0x21,
-	AStickLeftY			= 0x22,
+    // Buttons
+	Button0				= 0x30,
+	Button1				= 0x31,
+	Button2				= 0x32,
+	Button3				= 0x33,
+	Button4				= 0x34,
+	Button5				= 0x35,
+	Button6				= 0x36,
+	Button7				= 0x37,
+	Button8				= 0x38,
+	Button9				= 0x39,
+	Button10			= 0x3A,
+	Button11			= 0x3B,
+	Button12			= 0x3C,
+	Button13			= 0x3D,
+	Button14			= 0x3E,
+	Button15			= 0x3F,
+	ShoulderLeft1		= 0x40,
+	ShoulderLeft2		= 0x41,
+	ShoulderRight1		= 0x42,
+	ShoulderRight2		= 0x43,
 
-	AStickRightPress	= 0x30,
-	AStickRightX		= 0x31,
-	AStickRightY		= 0x32,
+    // Named Buttons
+    Start				= 0x50,
 
-	Button0				= 0x40,
-	Button1				= 0x41,
-	Button2				= 0x42,
-	Button3				= 0x43,
-	Button4				= 0x44,
-	Button5				= 0x45,
-	Button6				= 0x46,
-	Button7				= 0x47,
-	Button8				= 0x48,
-	Button9				= 0x49,
-	Button10			= 0x4A,
-	Button11			= 0x4B,
-	Button12			= 0x4C,
-	Button13			= 0x4D,
-	Button14			= 0x4E,
-	Button15			= 0x4F,
-
-	ShoulderLeft1		= 0x50,
-	ShoulderLeft2		= 0x51,
-	ShoulderRight1		= 0x52,
-	ShoulderRight2		= 0x53,
-
+    // ~
 	Undefined			= 0xFF,
 };
 inline std::ostream &operator<<(std::ostream &stream, ControllerButton button) {
 	switch (button) {
-		case ControllerButton::Null:				{ stream << "Null";				break; }
-		case ControllerButton::Start:				{ stream << "Start";			break; }
+        // Null
+		case ControllerButton::Null:				{ stream << "Null";		    	break; }
+                                   
+        // Analog Sticks
+        case ControllerButton::AStickLeftPress:		{ stream << "AStickLeftPress";	break; }
+        case ControllerButton::AStickLeftX:			{ stream << "AStickLeftX";		break; }
+        case ControllerButton::AStickLeftY:			{ stream << "AStickLeftY";		break; }
+        case ControllerButton::AStickRightPress:	{ stream << "AStickLeftPress";	break; }
+        case ControllerButton::AStickRightX:		{ stream << "AStickRightX";		break; }
+        case ControllerButton::AStickRightY:		{ stream << "AStickRightY";		break; }
+
+        // Digital Pad
 		case ControllerButton::DPadLeft:			{ stream << "DPadLeft";			break; }
 		case ControllerButton::DPadUp:				{ stream << "DPadUp";			break; }
 		case ControllerButton::DPadRight:			{ stream << "DPadRight";		break; }
 		case ControllerButton::DPadDown:			{ stream << "DPadDown";			break; }
-		case ControllerButton::AStickLeftPress:		{ stream << "AStickLeftPress";	break; }
-		case ControllerButton::AStickLeftX:			{ stream << "AStickLeftX";		break; }
-		case ControllerButton::AStickLeftY:			{ stream << "AStickLeftY";		break; }
-		case ControllerButton::AStickRightPress:	{ stream << "AStickLeftPress";	break; }
-		case ControllerButton::AStickRightX:		{ stream << "AStickRightX";		break; }
-		case ControllerButton::AStickRightY:		{ stream << "AStickRightY";		break; }
+
+        // Buttons
 		case ControllerButton::Button0:				{ stream << "Button0";			break; }
 		case ControllerButton::Button1:				{ stream << "Button1";			break; }
 		case ControllerButton::Button2:				{ stream << "Button2";			break; }
@@ -321,6 +451,11 @@ inline std::ostream &operator<<(std::ostream &stream, ControllerButton button) {
 		case ControllerButton::ShoulderLeft2:		{ stream << "ShoulderLeft2";	break; }
 		case ControllerButton::ShoulderRight1:		{ stream << "ShoulderRight1";	break; }
 		case ControllerButton::ShoulderRight2:		{ stream << "ShoulderRight2";	break; }
+                                             
+        // Named Buttons
+        case ControllerButton::Start:				{ stream << "Start";			break; }
+
+        // ~
 		case ControllerButton::Undefined:			{ stream << "-";				break; }
 	}
 	return stream;
@@ -328,7 +463,7 @@ inline std::ostream &operator<<(std::ostream &stream, ControllerButton button) {
 
 enum class KeyCode: uint8_t {
 	// Source:	https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
-	Null		= 0x00,
+    Null		= 0x00,
 
 	// Mouse:	  0x01-02
 	Cancel		= 0x03,
@@ -572,7 +707,7 @@ enum class KeyCode: uint8_t {
 };
 inline std::ostream &operator<<(std::ostream &stream, KeyCode code) {
 	switch (code) {
-		case KeyCode::Null:					{ stream << "Null";					break; }
+		case KeyCode::Null:				    { stream << "Null";				break; }
 		case KeyCode::Cancel:				{ stream << "Cancel";				break; }
 		case KeyCode::Back:					{ stream << "Back";					break; }
 		case KeyCode::Tab:					{ stream << "Tab";					break; }
@@ -763,7 +898,7 @@ inline std::ostream &operator<<(std::ostream &stream, KeyCode code) {
 }
 
 enum class MouseButton: uint8_t {
-	Null		= 0x00,
+    Null		= 0x00,
 	Left		= 0x01,
 	Middle		= 0x02,
 	Right		= 0x03,
@@ -777,7 +912,7 @@ enum class MouseButton: uint8_t {
 };
 inline std::ostream &operator<<(std::ostream &stream, MouseButton button) {
 	switch (button) {
-		case MouseButton::Null:			{ stream << "Null";			break; }
+		case MouseButton::Null:	    	{ stream << "Default";		break; }
 		case MouseButton::Left:			{ stream << "Left";			break; }
 		case MouseButton::Middle:		{ stream << "Middle";		break; }
 		case MouseButton::Right:		{ stream << "Right";		break; }
@@ -795,8 +930,8 @@ inline std::ostream &operator<<(std::ostream &stream, MouseButton button) {
 enum class TouchStyle: uint8_t {
 	Null		= 0x00,
 
-	Tap			= 0x10,
-	TapAndHold	= 0x11,
+    Hold	    = 0x10,
+	Tap			= 0x11,
 	DoubleTap	= 0x12,
 
 	Expand		= 0x20,
@@ -809,8 +944,8 @@ enum class TouchStyle: uint8_t {
 inline std::ostream &operator<<(std::ostream &stream, TouchStyle style) {
 	switch (style) {
 		case TouchStyle::Null:			{ stream << "Null";			break; }
+        case TouchStyle::Hold:	        { stream << "Hold";	        break; }
 		case TouchStyle::Tap:			{ stream << "Tap";			break; }
-		case TouchStyle::TapAndHold:	{ stream << "TapAndHold";	break; }
 		case TouchStyle::DoubleTap:		{ stream << "DoubleTap";	break; }
 		case TouchStyle::Expand:		{ stream << "Expand";		break; }
 		case TouchStyle::Swipe:			{ stream << "Swipe";		break; }
@@ -823,10 +958,9 @@ inline std::ostream &operator<<(std::ostream &stream, TouchStyle style) {
 
 
 
-/**
-* @brief	States
-*/
-
+///
+/// @brief States
+///
 enum class ButtonState: uint8_t {
 	Null		= 0x00,
 	Press		= 0x01,
@@ -864,26 +998,26 @@ inline std::ostream &operator<<(std::ostream &stream, KeyState state) {
 }
 
 struct ModifierState {
-	bool Alt = false;
-	bool Control = false;
-	bool Shift = false;
-	bool Super = false;
+	bool Alt        = false;
+	bool Control    = false;
+	bool Shift      = false;
+	bool Super      = false;
 };
 inline std::ostream &operator<<(std::ostream &stream, ModifierState state) {
 	stream	<< "Alt:"		<< state.Alt		<< "|"
-		<< "Control:"	<< state.Control	<< "|"
-		<< "Shift:"		<< state.Shift		<< "|"
-		<< "Super:"		<< state.Super;
+		    << "Control:"	<< state.Control	<< "|"
+		    << "Shift:"		<< state.Shift		<< "|"
+		    << "Super:"		<< state.Super;
 	return stream;
 }
 enum class ModifierStateE: uint16_t {
-	Ctrl	= BitMask(0),	Control		= Ctrl,
-	Shift	= BitMask(1),
-	Alt		= BitMask(2),	Alternate	= Alt,		Option	= Alt,
-	AltGr	= BitMask(3),	AlternateGraphic	= AltGr,
-	Meta	= BitMask(4),
-	Super	= BitMask(5),	Windows		= Super,	Command	= Super,
-	Fn		= BitMask(6),	Function	= Fn,
+	Ctrl	    = BitMask(0),	Control		        = Ctrl,
+	Shift	    = BitMask(1),
+	Alt		    = BitMask(2),	Alternate	        = Alt,		Option	= Alt,
+	AltGr	    = BitMask(3),	AlternateGraphic	= AltGr,
+	Meta	    = BitMask(4),
+	Super	    = BitMask(5),	Windows		        = Super,	Command	= Super,
+	Fn		    = BitMask(6),	Function	        = Fn,
 
 	MouseLeft	= BitMask(7),
 	MouseMiddle	= BitMask(8),
@@ -894,7 +1028,7 @@ enum class ModifierStateE: uint16_t {
 struct ModifierStateMask {
 	uint16_t Mask = 0;
 };
-;inline std::ostream &operator<<(std::ostream &stream, ModifierStateMask state) {
+inline std::ostream &operator<<(std::ostream &stream, ModifierStateMask state) {
 	//stream	<< "Alt:"		<< (state.Mask & (uint16_t)ModifierStateE::Alt)		<< "|"
 	//		<< "Ctrl:"		<< (state.Mask & (uint16_t)ModifierStateE::Ctrl)	<< "|"
 	//		<< "Shift:"		<< (state.Mask & (uint16_t)ModifierStateE::Shift)	<< "|"
@@ -905,36 +1039,122 @@ struct ModifierStateMask {
 
 
 
-/**
-* @brief	Event Data
-*/
-
-class EventData {
-public:
-	EventData() {};
-	virtual ~EventData() {};
+///
+/// @brief Event Data
+///
+// Interface
+struct EventData {
+    // Default
+    EventData() = default;
+    virtual ~EventData() = default;
 };
 
+// System
+struct DeviceEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::System;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Device;
 
-struct DeviceEventData {
-	static const EventCategory Category = EventCategory::System;
-	static const EventSource Source = EventSource::Device;
-
+    // Data
 	DeviceAction Action = DeviceAction::Undefined;
 };
 
-struct PowerEventData {
-	static const EventCategory Category = EventCategory::System;
-	static const EventSource Source = EventSource::Power;
+struct PowerEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::System;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Power;
 
+    // Data
 	PowerAction Action = PowerAction::Undefined;
 };
 
+struct StateEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::System;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Power;
 
-struct ControllerEventData {
-	static const EventCategory Category = EventCategory::Application;
-	static const EventSource Source = EventSource::Controller;
+    // Data
+    StateAction Action = StateAction::Undefined;
+};
 
+// Application
+struct WindowEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::Application;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Window;
+
+    // Data
+    WindowAction Action = WindowAction::Undefined;
+
+    bool Active = false;
+    bool Focus = false;
+    bool Visible = true;
+
+    float DpiValue = 0.0f;
+    uint32_t Height = 0;
+    uint32_t Width = 0;
+
+    int32_t DeltaX = 0;
+    int32_t DeltaY = 0;
+    int32_t LastX = 0;
+    int32_t LastY = 0;
+    int32_t X = 0;
+    int32_t Y = 0;
+};
+
+struct ContextEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::Application;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Context;
+
+    // Data
+    ContextAction Action = ContextAction::Undefined;
+};
+
+// Library
+struct CoreEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::Library;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Core;
+
+    // Data
+    CoreAction Action = CoreAction::Undefined;
+};
+
+struct GraphicsEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::Library;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Graphics;
+
+    // Data
+    GraphicsAction Action = GraphicsAction::Undefined;
+};
+
+struct InterfaceEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::Library;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Interface;
+
+    // Data
+    InterfaceAction Action = InterfaceAction::Undefined;
+};
+
+// User
+struct ControllerEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::User;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Controller;
+
+    // Data
 	ControllerAction Action = ControllerAction::Undefined;
 	ControllerButton Button = ControllerButton::Undefined;
 	ButtonState State = ButtonState::Undefined;
@@ -952,10 +1172,13 @@ struct ControllerEventData {
 	int32_t Y = 0;
 };
 
-struct KeyboardEventData {
-	static const EventCategory Category = EventCategory::Application;
-	static const EventSource Source = EventSource::Keyboard;
-	
+struct KeyboardEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::User;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Keyboard;
+
+    // Data
 	KeyboardAction Action = KeyboardAction::Undefined;
 	char Character = 0;
 	KeyCode Key = KeyCode::Undefined;
@@ -964,10 +1187,13 @@ struct KeyboardEventData {
 
 };
 
-struct MouseEventData {
-	static const EventCategory Category = EventCategory::Application;
-	static const EventSource Source = EventSource::Mouse;
+struct MouseEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::User;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Mouse;
 
+    // Data
 	MouseAction Action = MouseAction::Undefined;
 	MouseButton Button = MouseButton::Undefined;
 	ButtonState State = ButtonState::Undefined;
@@ -985,10 +1211,13 @@ struct MouseEventData {
 	int32_t Y = 0;
 };
 
-struct TouchEventData {
-	static const EventCategory Category = EventCategory::Application;
-	static const EventSource Source = EventSource::Touch;
+struct TouchEventData: public EventData {
+    // Specification
+    EventCategory Category  = EventCategory::User;
+    EventPriority Priority  = EventPriority::Default;
+    EventSource Source      = EventSource::Touch;
 
+    // Data
 	TouchAction Action = TouchAction::Undefined;
 	TouchStyle Style = TouchStyle::Undefined;
 
@@ -1003,34 +1232,5 @@ struct TouchEventData {
 	int32_t Y = 0;
 };
 
-struct WindowEventData {
-	static const EventCategory Category = EventCategory::Application;
-	static const EventSource Source = EventSource::Window;
-
-	WindowAction Action = WindowAction::Undefined;
-
-	bool Active = false;
-	bool Focus = false;
-	bool Visible = true;
-
-	float DpiValue = 0.0f;
-	uint32_t Height = 0;
-	uint32_t Width = 0;
-
-	int32_t DeltaX = 0;
-	int32_t DeltaY = 0;
-	int32_t LastX = 0;
-	int32_t LastY = 0;
-	int32_t X = 0;
-	int32_t Y = 0;
-};
-
-
-struct ContextEventData {
-	static const EventCategory Category = EventCategory::Library;
-	static const EventSource Source = EventSource::Context;
-
-	ContextAction Action = ContextAction::Undefined;
-};
 
 }

@@ -1,6 +1,8 @@
-{ 
-    "name": "App",
-    "version-string": "0.0.1",
-    "dependencies": [
-    ] 
+{
+  "name": "app",
+  "version-string": "0.0.1",
+  "description":  "C++ 20 Playground",
+  "dependencies": [
+    "yaml-cpp"
+  ] 
 }

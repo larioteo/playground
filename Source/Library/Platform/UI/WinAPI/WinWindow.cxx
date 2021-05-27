@@ -339,8 +339,6 @@ intptr_t WinWindow::Message(void *event) {
     *			https://docs.microsoft.com/en-us/windows/win32/gdi/painting-and-drawing-messages
     */
     // Process important window related events internally
-    #ifdef APP_DISABLED_CODE
-
     switch (msg.message) {
         // Pre-Check: Does this message belong to the current window?
         case WM_NULL: {
@@ -348,7 +346,7 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                    // Preparation
+        // Preparation
         case WM_NCCREATE: {
             // Note: Could be usefull in the future.
             break;
@@ -358,13 +356,13 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                          // Creation and Destruction
+        // Creation and Destruction
         case WM_CLOSE: {
             // Ensure that the Window gets destroyed and release the handle to it
             if (DestroyWindow(WindowHandle)) {
                 WindowHandle = nullptr;
             } else {
-                applog << Log::Error << "Could not release handle to window.\n";
+                applog << LogLevel::Error << "Could not release handle to window.\n";
             }
 
             result = 0;
@@ -384,7 +382,7 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                       // Information
+        // Information
         case WM_DPICHANGED: {
             // Note: Could be usefull in the future.
             break;
@@ -406,7 +404,7 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                             // Drawing
+        // Drawing
         case WM_PAINT: {
             Data.Decorated = true;
 
@@ -458,7 +456,7 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                      // State
+        // State
         case WM_ACTIVATE: {
             Data.Active = (bool)msg.wParam;
 
@@ -489,7 +487,7 @@ intptr_t WinWindow::Message(void *event) {
             break;
         }
 
-                        // System
+        // System
         case WM_SYSCOMMAND: {
             // Disable ALT application menu
             if ((msg.wParam & 0xfff0) == SC_KEYMENU) { result = 0; break; }
@@ -507,21 +505,20 @@ intptr_t WinWindow::Message(void *event) {
             }
         }
 
-                          // Default: Currently nothing of interest
+        // Default: Currently nothing of interest
         default: {
             break;
         }
     }
 
     // Publish events to an external event system
-    if (!EventCallback.Empty()) {
-        bool external = false;
-        EventCallback.Publish(external, event);
-        if (external && result) result = 0;
-    }
+    //if (!EventCallback.Empty()) {
+    //    bool external = false;
+    //    EventCallback.Publish(external, event);
+    //    if (external && result) result = 0;
+    //}
 
     if (!result) return result;
-    #endif
     return DefWindowProc(msg.hwnd, msg.message, msg.wParam, msg.lParam);
 }
 

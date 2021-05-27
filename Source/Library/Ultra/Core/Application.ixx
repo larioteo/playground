@@ -107,6 +107,7 @@ public:
 
     // Accessors
     static ApplicationProperties &GetProperties() { return Get().mProperties; }
+    static Window &GetWindow() { return *Get().mWindow; }
     static Statistics GetStatistics() { return Get().statistics; };
 
     // With this method, everything begins.

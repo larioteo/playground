@@ -15,6 +15,8 @@ export import Ultra.Core.Layer;
 
 // System Extensions
 export import Ultra.System.Cli;
+export import Ultra.System.FileSystem;
+export import Ultra.System.Input;
 
 // UI Extensions
 export import Ultra.UI.Event;
@@ -22,10 +24,13 @@ export import Ultra.UI.Window;
 
 // Utility Extensions
 export import Ultra.Utility.DateTime;
+export import Ultra.Utility.Delegate;
 export import Ultra.Utility.Enum;
-export import Ultra.Utility.EventData;
+export import Ultra.Utility.Future;
+export import Ultra.Utility.Property;
 export import Ultra.Utility.Random;
 export import Ultra.Utility.String;
+export import Ultra.Utility.ThreadPool;
 export import Ultra.Utility.Timer;
 export import Ultra.Utility.UUID;
 

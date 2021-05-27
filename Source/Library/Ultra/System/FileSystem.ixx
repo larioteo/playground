@@ -5,52 +5,53 @@
 #include <mutex>
 #include <string>
 
-export module Ultra.FileSystem;
+export module Ultra.System.FileSystem;
 
 import Ultra.Log;
 import Ultra.Utility.String;
 
-/**
-* @brief Helper: File System Object Information
-*/
-
 export namespace Ultra {
 
-/* Retrieve the extension of a given file system object. */
-static bool FileSystemObjectExists(const std::string &object) {
+///
+/// @brief Helper: File System Object Information
+///
+
+// Retrieve the extension of a given file system object.
+bool FileExists(const std::string &object) {
     return std::filesystem::exists(object);
 }
 
-/* Retrieve the extension of a given file system object. */
-static const std::string GetFileExtension(const std::string &object) noexcept {
-    std::filesystem::path result = object;
-    return result.extension().string();
-}
-
-/* Retrieve the name of a given file system object. */
-static const std::string GetFileName(const std::string &object) noexcept {
-    std::filesystem::path result = object;
-    return result.stem().string();
-}
-
-/* Retrieve the path of a given file system object. */
-static const std::string GetFilePath(const std::string &object) noexcept {
-    std::filesystem::path result = object;
-    return result.parent_path().string();
-}
-
-/* Retrieve the root directory of a given file system object. */
-static const std::string GetFileRoot(const std::string &object) noexcept {
+// Retrieve the root directory of a given file system object.
+std::string GetFileRoot(const std::string &object) noexcept {
     std::filesystem::path result = object;
     return result.root_path().string();
 }
 
-/**
-* @brief Helper: File System Object Operations
-*/
+// Retrieve the path of a given file system object.
+std::string GetFilePath(const std::string &object) noexcept {
+    std::filesystem::path result = object;
+    return result.parent_path().string();
+}
 
-/* Read data from file system object. */
-static std::string ReadFile(const std::string &file) {
+// Retrieve the name of a given file system object.
+std::string GetFileName(const std::string &object) noexcept {
+    std::filesystem::path result = object;
+    return result.stem().string();
+}
+
+// Retrieve the extension of a given file system object.
+std::string GetFileExtension(const std::string &object) noexcept {
+    std::filesystem::path result = object;
+    return result.extension().string();
+}
+
+
+///
+/// @brief Helper: File System Object Operations
+///
+
+// Read data from file system object.
+std::string ReadFile(const std::string &file) {
     std::string result;
     std::ifstream stream(file, std::ios::in | std::ios::binary); // ate?
                                                                  // if is_open file in use
@@ -70,9 +71,8 @@ static std::string ReadFile(const std::string &file) {
     }
     return result;
 }
-
-/* Test: Read data from file system object. */
-static std::string ReadFile2(const std::string &object) {
+// Test: Read data from file system object.
+std::string ReadFileV2(const std::string &object) {
     static std::ifstream FileStream;
     static std::stringstream FileCache;
 
@@ -129,8 +129,8 @@ static std::string ReadFile2(const std::string &object) {
     //}
     return result;
 }
-
-static void LoadFile(const std::string object) {
+// Test: Load data from file (in memory map)
+void LoadFile(const std::string object) {
     //ofstream fso;
     //fso.open(object);
 
@@ -144,7 +144,8 @@ static void LoadFile(const std::string object) {
 
 }
 
-static bool WriteFile(const std::string &file, const std::string &data) {
+// Write data to file system object.
+bool WriteFile(const std::string &file, const std::string &data) {
     auto Directory = std::filesystem::path(file).parent_path();
     if (!Directory.empty()) std::filesystem::create_directories(Directory);
 
@@ -154,8 +155,8 @@ static bool WriteFile(const std::string &file, const std::string &data) {
     return true;
 }
 
-
-static std::vector<std::string> SearchFiles(const std::string &object, const std::string &token) {
+// Get files from directory
+std::vector<std::string> SearchFiles(const std::string &object, const std::string &token) {
     using namespace std::filesystem;
 
     std::vector<std::string> result;

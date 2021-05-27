@@ -10,9 +10,14 @@
     },
     ["Config"] = {
         ".clang-format",
+        ".clang-tidy",
         ".editorconfig",
         ".gitignore",
+        "vcpkg.json",
         "Source/Settings.h",
+    },
+    ["Data"] = {
+        "Data/Config.yml"
     },
     ["Manual"] = {
         "License",
