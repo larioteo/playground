@@ -3,6 +3,7 @@
 #include <format>
 #include <functional>
 #include <future>
+#include <tuple>
 
 #include <Ultra/EntryPoint.h>
 
@@ -21,16 +22,16 @@ public:
     void Destroy() override {}
     void Update(Timestamp deltaTime) override {}
 
-    bool EventFn(string test) {
-        applog << "I'm a member function: " << test << "\n";
+    bool Event(string test) {
+        applog << "Event: " << test << "\n";
         return true;
     }
-    const bool EventFn2(string test) {
-        applog << "I'm a const member function: " << test << "\n";
+    const bool ConstEvent(string test) {
+        applog << "ConstEvent: " << test << "\n";
         return true;
     }
-    static bool EventFn3(string test) {
-        applog << "I'm a static member function: " << test << "\n";
+    static bool StaticEvent(string test) {
+        applog << "StaticEvent: " << test << "\n";
         return true;
     }
 
@@ -44,52 +45,40 @@ public:
 
         // New-Stuff Zone
 
-        Utility::Delegate<void()> delegate;
+        Delegate<void()> delegateA;
         {
-            Utility::Delegate<bool(string)> delegate2;
+            auto lambdaA = []() { applog << "LambdaA()\n"; };
+            auto lambdaB = []() { applog << "LambdaB()\n"; };
 
-            auto lambda = []() {
-                applog << "I'm a lambda!\n";
-            };
-            auto lambda2 = []() {
-                applog << "I'm a lambda2!\n";
-            };
+            delegateA.Attach(lambdaA);
+            delegateA.Attach(lambdaA);
+            delegateA += lambdaB;
+            delegateA += lambdaB;
 
-            delegate.Attach(lambda);
-            delegate.Attach(lambda);
-            delegate += lambda2; // ToDo: Observer deleted immediately
+            auto lambdaC = [this](auto &&...args) { return Event(args...); };
+            auto lambdaD = [this](auto &&...args) { return ConstEvent(args...); };
+            //auto lambdaE = CreateDelegate<&App::Event>();
 
-            delegate2.Attach([this](string test) { return EventFn(test); });
-            delegate2.Attach([this](string test) { return EventFn2(test); });
-            delegate2.Attach(EventFn3);
+            Delegate<bool(string)> delegateB;
+            delegateB.Attach(lambdaC);
+            delegateB.Attach(lambdaD);
+            delegateB.Attach(StaticEvent);
+            delegateB += lambdaC;
+            delegateB += lambdaD;
+            delegateB += StaticEvent;
 
+            delegateA();
+            delegateB("EventData");
+
+            delegateA -= lambdaB;
+            delegateB.Detach(StaticEvent);
+            delegateB -= StaticEvent;
+            delegateB -= lambdaD;
             
-            //subject -= lambda2;
-
-            delegate();
-            delegate2("EventData");
-
-
-            delegate -= lambda2;
-            delegate2 -= EventFn3;
-            delegate2.Detach([this](string test) { return EventFn2(test); });
-            
-            delegate2.Publish("EventData");
-            delegate.Publish();
+            delegateB.Publish("EventData");
+            delegateA.Publish();
         }
-        delegate();
-
-
-        //Delegate<void(char const *)> d0;
-
-        //d0 += f;
-        //d0 += mem_call(f0, &foo::bar);
-        //d0 += mem_call(f1, &foo::bar);
-        //d0("first call");
-        //d0 -= g;
-        //d0 -= mem_call(f0, &foo::cbs);
-        //d0 -= mem_call(f1, &foo::bar);
-        //d0("second call");
+        delegateA();
 
         //~New-Stuff Zone
 
